@@ -49,21 +49,17 @@ class ReversePolishConverter():
                 if token == "(":
                     buffer.push(token)
                 elif token == ")":
-                    while buffer[-1] != "(":
-                        result.append(buffer.peek())
-                        buffer.pop()
+                    while buffer.peek() != "(":
+                        result.append(buffer.pop())
                     buffer.pop()
                 else:
-                    while buffer and PRIORITIES[token] <= PRIORITIES[buffer.peek()]:
-                        result.append(buffer.peek())
-                        buffer.pop()
+                    while len(buffer) > 0 and PRIORITIES[token] <= PRIORITIES[buffer.peek()]:
+                        result.append(buffer.pop())
                     buffer.push(token)
 
-        buff = []
         while (len(buffer) > 0):
-            buff.append(buffer.pop())
-        
-        result += buff[::-1]
+            result.append(buffer.pop())
+
         return result
 
 class ReversePolishCounter():

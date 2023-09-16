@@ -1,26 +1,25 @@
-from timeit import timeit
-import collections
+from polish import ReversePolishConverter, ReversePolishCounter
+import unittest
 
-a = """\
-import collections
-s = collections.deque()
-for i in range(1, 10000000):
-    s.append(128)
-    if (i % 150 == 0):
-        for j in range(100):
-            s.pop()
-"""
+test_conv = lambda conv, x: " ".join(conv.convert(x))
+test_count = lambda counter, x, y: (counter.calculate(x) - y < 0.001)
 
-b = """\
-s = []
-for i in range(1, 10000000):
-    s.append(128)
-    if (i % 150 == 0):
-        for j in range(100):
-            s.pop()
-"""
+class TestStack(unittest.TestCase):
 
-t1 = timeit(stmt=a, number=1)
-t2 = timeit(stmt=b, number=1)
+    def test_converter(self):
+        converter = ReversePolishConverter()
+        self.assertEqual(test_conv(converter, "1+7*(8-6)"), "1 7 8 6 - * +")
+        self.assertEqual(test_conv(converter, "1 + 7 * ( 8 - 6 )"), "1 7 8 6 - * +")
+        self.assertEqual(test_conv(converter, "a+(b-c)*d"), "a b c - d * +")
+        self.assertEqual(test_conv(converter, "(6 + 9 - 5)/(8 + 1 * 2)+7"), "6 9 + 5 - 8 1 2 * + / 7 +")
+    
+    def test_counter(self):
+        counter = ReversePolishCounter()
+        self.assertEqual(test_count(counter, "1 7 8 6 - * +", 15), True)
+        self.assertEqual(test_count(counter, "6 9 + 5 - 8 1 2 * + / 7 +", 8), True)
+        self.assertEqual(test_count(counter, "1 7 8 6 - * +", 15), True)
+        self.assertEqual(test_count(counter, "1 7 8 6 - * +", 15), True)
+        self.assertEqual(test_count(counter, "1 7 8 6 - * +", 15), True)
 
-print(t1, t2)
+if __name__ == '__main__':
+    unittest.main()
