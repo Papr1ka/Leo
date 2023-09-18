@@ -9,7 +9,7 @@
     number := number + 1;
     j := 0;
 
-    for i := 1 to true step 1
+    for i := 1 to number + 1 step 1
     begin
 
     if (number / i * i == number) j := j + 1

@@ -286,12 +286,19 @@ class Parser:
     def operator_for_parser(self) -> Tuple[ASTNode, ASTNode]:
         node_step = None
         self.skip_lex(Lex.KEYWORD_FOR)
+        lex_assignment_start = self.lexeme
         node_assignment = self.operator_assignment_parser()
+        if node_assignment.var.t_type == Types.bool:
+            ctx_error("Переменная цикла for должна быть числом, иначе используйте while", lex_assignment_start)
         self.skip_lex(Lex.KEYWORD_TO)
         lex_expression_start = self.lexeme
         node_condition = self.expression_parser()
         if node_condition.t_type == Types.bool:
             ctx_error("Условие цикла for должно быть числом", lex_expression_start)
+        if node_condition.t_type != node_assignment.var.t_type:
+            ctx_error(f"Несоответствие типоа, переменная цикла должна быть типа \
+{node_assignment.var.name} ({node_assignment.var.t_type.name})", lex_expression_start)
+
 
         node_condition = ASTBinOperation(
             node_assignment.var,
