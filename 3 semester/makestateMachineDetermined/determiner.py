@@ -28,17 +28,36 @@ transitions = {
     }
 }
 
+# transitions = {
+#     #Откуда, по какому символу, куда
+#     '1' : {
+#         'a': ['1', '2'],
+#         'b': ['3'],
+#     },
+#     '2' : {
+#         'a': ['2'],
+#         'b': ['1', '3'],
+#     },
+#     '3': {
+#         'a': ['3'],
+#         'b': ['3']
+#     }
+# }
+
+def combineArrays(a1: list, a2: list):
+    return list(sorted(set([*a1, *a2])))
+
 def combineDicts(d1: dict, d2: dict, d3: dict):
     for key in d1.keys():
         if key in d2.keys():
-            d3[key] = [*d1[key], *d2[key]]
+            d3[key] = combineArrays(d1[key], d2[key])
         else:
             d3[key] = d1[key]
 
     for key in d2.keys():
         if key not in d3.keys():
             if key in d1.keys():
-                d3[key] = [*d1[key], *d2[key]]
+                d3[key] = combineArrays(d1[key], d2[key])
             else:
                 d3[key] = d2[key]
 
@@ -49,6 +68,10 @@ initial_state = [
 final_states = [
     '4'
 ]
+
+# final_states = [
+#     '3'
+# ]
 
 def determine():
 
@@ -65,10 +88,10 @@ def determine():
                         combineDicts(new_transitions, transitions[s], new_transitions)
                 transitions[state] = new_transitions
 
-            if len(transitions[state][symbol]) > 1:
-                new_state = separator.join(transitions[state][symbol])
-                if new_state not in queue:
-                    queue.append(new_state)
+            #if len(transitions[state][symbol]) > 1:
+            new_state = separator.join(transitions[state][symbol])
+            if new_state not in queue:
+                queue.append(new_state)
         i += 1
 
     for state in transitions.keys():
@@ -93,7 +116,7 @@ def printStateMachine():
     for state in transitions.keys():
         for symbol in transitions[state]:
             print(f"{state} ({symbol}) -> {transitions[state][symbol]}")
-    print(f"InitialState: {initial_state}")
+    print(f"InitialState: {initial_state[0]}")
     print(f"FinalStates: {', '.join([i for i in transitions.keys() if included(i)])}")
 
 if __name__ == "__main__":
