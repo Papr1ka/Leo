@@ -96,7 +96,8 @@ def printStateMachine():
     print(f"InitialState: {initial_state}")
     print(f"FinalStates: {', '.join([i for i in transitions.keys() if included(i)])}")
 
-determine()
-from pprint import pprint
-pprint(transitions)
-printStateMachine()
+if __name__ == "__main__":
+    determine()
+    from pprint import pprint
+    pprint(transitions)
+    printStateMachine()
