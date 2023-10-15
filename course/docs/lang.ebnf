@@ -1,0 +1,150 @@
+letter =
+'a' |
+'b' |
+'c' |
+'d' |
+'e' |
+'f' |
+'g' |
+'h' |
+'i' |
+'j' |
+'k' |
+'l' |
+'m' |
+'n' |
+'o' |
+'p' |
+'q' |
+'r' |
+'s' |
+'t' |
+'u' |
+'v' |
+'w' |
+'x' |
+'y' |
+'z' |
+'A' |
+'B' |
+'C' |
+'D' |
+'E' |
+'F' |
+'G' |
+'H' |
+'I' |
+'J' |
+'K' |
+'L' |
+'M' |
+'N' |
+'O' |
+'P' |
+'Q' |
+'R' |
+'S' |
+'T' |
+'U' |
+'V' |
+'W' |
+'X' |
+'Y' |
+'Z';
+
+digit =
+'0' |
+'1' |
+'2' |
+'3' |
+'4' |
+'5' |
+'6' |
+'7' |
+'8' |
+'9';
+
+ident = letter, {(letter | digit)};
+
+number = digit, { digit };
+
+expression =
+summa |
+expression, operation_compare, summa;
+
+summa = multiplication, {operation_addition, multiplication};
+
+multiplication = factor, {operation_multiplication, factor};
+
+factor = 
+ident |
+number |
+boolean_constant |
+unary_operation, factor |
+'(', expression, ')';
+
+boolean_constant =
+'true' |
+'false';
+
+operation_compare = 
+'!=' |
+'==' |
+'<' |
+'<=' |
+'>' |
+'>=';
+
+operation_addition =
+'+' |
+'-' |
+'||';
+
+operation_multiplication =
+'*' |
+'/' |
+'&&';
+
+unary_operation =
+'!';
+
+program = 
+'{', (description | operator), ';', { (description | operator), ';' }, '}';
+
+description =
+type, ident, {',', ident};
+
+type = 
+'int' |
+'float' |
+'bool';
+
+operator =
+operator_composite |
+operator_assignment |
+operator_conditional |
+operator_for |
+operator_while |
+operator_in |
+operator_out;
+
+operator_composite = 
+'begin', operator, {';', operator}, 'end';
+
+operator_assignment = 
+ident, ':=', expression;
+
+operator_conditional =
+'if', '(', expression, ')', operator, ['else', operator];
+
+operator_for = 
+'for', operator_assignment, to, expression, ['step', expression], operator, 'next';
+
+operator_while =
+'while', '(', expression, ')', operator;
+
+operator_in =
+'readln', ident, {',', ident};
+
+operator_out =
+'writeln', expression, {',', expression};

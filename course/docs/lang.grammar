@@ -1,0 +1,151 @@
+LETTER ->   'a' |
+            'b' |
+            'c' |
+            'd' |
+            'e' |
+            'f' |
+            'g' |
+            'h' |
+            'i' |
+            'j' |
+            'k' |
+            'l' |
+            'm' |
+            'n' |
+            'o' |
+            'p' |
+            'q' |
+            'r' |
+            's' |
+            't' |
+            'u' |
+            'v' |
+            'w' |
+            'x' |
+            'y' |
+            'z' |
+            'A' |
+            'B' |
+            'C' |
+            'D' |
+            'E' |
+            'F' |
+            'G' |
+            'H' |
+            'I' |
+            'J' |
+            'K' |
+            'L' |
+            'M' |
+            'N' |
+            'O' |
+            'P' |
+            'Q' |
+            'R' |
+            'S' |
+            'T' |
+            'U' |
+            'V' |
+            'W' |
+            'X' |
+            'Y' |
+            'Z'
+
+DIGIT = '0' |
+        '1' |
+        '2' |
+        '3' |
+        '4' |
+        '5' |
+        '6' |
+        '7' |
+        '8' |
+        '9'
+
+IDENT = LETTER |
+        IDENT LETTER |
+        IDENT DIGIT
+
+NUMBER =    DIGIT |
+            NUMBER DIGIT
+
+EXPRESSION =    SUMMA |
+                EXPRESSION OPERATION_COMPARE SUMMA
+
+SUMMA = MULTIPLICATION |
+        SUMMA OPERATION_ADDITION MULTIPLICATION |
+
+MULTIPLICATION =    FACTOR |
+                    MULTIPLICATION OPERATION_MULTIPLICATION FACTOR
+
+FACTOR =    IDENT |
+            NUMBER |
+            BOOLEAN_CONSTANT |
+            UNARY_OPERATION FACTOR |
+            ( EXPRESSION )
+
+BOOLEAN_CONSTANT =  true |
+                    false
+
+OPERATION_COMPARE = != |
+                    == |
+                    < |
+                    <= |
+                    > |
+                    >=
+
+OPERATION_ADDITION =    + |
+                        - |
+                        ||
+
+OPERATION_MULTIPLICATION =  * |
+                            / |
+                            &&
+
+UNARY_OPERATION = !
+
+PROGRAM = { BODY }
+
+BODY =  DESCRIPTION; |
+        OPERATOR; |
+        BODY DESCRIPTION; |
+        BODY OPERATOR;
+
+DESCRIPTION =   TYPE ID
+
+ID =    IDENT |
+        IDENT, ID
+
+TYPE =  int |
+        float |
+        bool
+
+OPERATOR =  OPERATOR_COMPOSITE |
+            OPERATOR_ASSIGNMENT |
+            OPERATOR_CONDITIONAL |
+            OPERATOR_FOR |
+            OPERATOR_WHILE |
+            OPERATOR_IN |
+            OPERATOR_OUT
+
+OPERATOR_COMPOSITE = begin OPER end
+
+OPER =  OPERATOR |
+        OPER; OPERATOR
+
+OPERATOR_ASSIGNMENT =   IDENT := EXPRESSION
+
+OPERATOR_CONDITIONAL =  if ( EXPRESSION ) OPERATOR |
+                        if ( EXPRESSION ) OPERATOR else OPERATOR
+
+OPERATOR_FOR =  for OPERATOR_ASSIGNMENT to EXPRESSION OPERATOR next |
+                for OPERATOR_ASSIGNMENT to EXPRESSION step EXPRESSION OPERATOR next
+
+OPERATOR_WHILE = while ( EXPRESSION ) OPERATOR
+
+OPERATOR_IN = readln ID
+
+OPERATOR_OUT = writeln EXPR
+
+EXPR =  EXPRESSION |
+        EXPR, EXPRESSION
