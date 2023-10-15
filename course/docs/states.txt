@@ -1,0 +1,15 @@
+START - начальное состояние
+IDENTIFICATOR - идентификаторы
+NUMBER - числа
+SEPARATOR_NOT_EQUALS - !=
+SEPARATOR_EQUALS - ==
+SEPARATOR_LTE - <, <=
+SEPARATOR_GTE - >, >=
+SEPARATOR_OR - ||
+SEPARATOR_AND - &&
+SEPARATOR_ASSIGNMENT - :=
+DELIM - (, ), +, -, *, /, !, {, }, ;
+ERR - ошибка
+COMMENT1 - /*
+COMMENT2 - * - любые символы
+COMMENT3 - */

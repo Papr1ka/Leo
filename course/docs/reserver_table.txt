@@ -1,0 +1,16 @@
+begin
+end
+if
+else
+for
+to
+step
+next
+while
+readln
+writeln
+true
+false
+int
+float
+bool
