@@ -1,6 +1,11 @@
 START - начальное состояние
 IDENTIFICATOR - идентификаторы
-NUMBER - числа
+NUMBERBIN - двоичные числа
+NUMBEROCT - восьмиричные числа
+NUMBERDEC - десятичные числа
+NUMBERHEX - шестнадцатиричные числа
+DOT - точка
+FRACTIONAL - дробная часть числа
 SEPARATOR_NOT_EQUALS - !=, !
 SEPARATOR_EQUALS - ==
 SEPARATOR_LTE - <, <=

@@ -66,8 +66,79 @@ IDENT = LETTER |
         IDENT LETTER |
         IDENT DIGIT
 
-NUMBER =    DIGIT |
-            NUMBER DIGIT
+NUMBER = 
+INTEGER |
+REAL
+
+INTEGER =
+BINARY |
+OCTAL |
+DECIMAL |
+HEXADECIMAL
+
+BINARY =        BIN 'B' |
+                BIN 'b' |
+                BINARY
+
+
+BIN =   0 |
+        1
+
+OCTAL = OCT 'O' |
+        OCT 'o' |
+        OCT OCTAL
+
+OCT =   '0' |
+        '1' |
+        '2' |
+        '3' |
+        '4' |
+        '5' |
+        '6' |
+        '7'
+
+DECIMAL =       DIG 'D' |
+                DIG 'd' |
+                DIG
+
+DIG =   DIGIT |
+        DIG DIGIT
+
+HEXADECIMAL =   HEX 'H' |
+                HEX 'h'
+
+HEX =
+DIGIT |
+HEX DIGIT |
+HEX HEXCHAR
+
+HEXCHAR =       'a' |
+                'b' |
+                'c' |
+                'd' |
+                'e' |
+                'f' |
+                'A' |
+                'B' |
+                'C' |
+                'D' |
+                'E' |
+                'F'
+
+REAL =
+DIG NUMORDER |
+DIG . DIG NUMORDER |
+. DIG NUMORDER |
+. DIG |
+DIG . DIG
+
+NUMORDER = 
+'E' + DIG |
+'E' - DIG |
+'e' + DIG |
+'e' - DIG |
+'E' DIG |
+'e' DIG
 
 EXPRESSION =    SUMMA |
                 EXPRESSION OPERATION_COMPARE SUMMA

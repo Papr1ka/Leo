@@ -66,7 +66,27 @@ digit =
 
 ident = letter, {(letter | digit)};
 
-number = digit, { digit };
+number = (integer | real);
+
+integer =   binary |
+            octal |
+            decimal |
+            hexadecimal
+
+binary = {/ '0' | '1' /}, ('B' | 'b')
+
+octal = {/ '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' /}, ('O' | 'o')
+
+decimal = {/ digit /}, ['D' | 'd']
+
+hexadecimal = digit, {digit | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F'}, ('H' | 'h')
+
+real =
+{/ digit /}, numorder |
+[{/ digit /}], '.', {/ digit /}, [numorder]
+
+numorder =
+('E' | 'e'), ['+' | '-'], {/ digit /}
 
 expression =
 summa |
