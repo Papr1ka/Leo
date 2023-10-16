@@ -1,0 +1,48 @@
+digraph finite_state_machine {
+    fontname="Helvetica,Arial,sans-serif"
+    node [fontname="Helvetica,Arial,sans-serif"]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+    rankdir=LR;
+    node [shape = doublecircle];
+    node [shape = circle];
+    START -> IDENTIFICATOR [label = "letter"]
+
+    IDENTIFICATOR -> IDENTIFICATOR [label = "letter, digit"]
+
+    IDENTIFICATOR -> START [label = "_"]
+
+    START -> NUMBERBIN [label = "0, 1"]
+
+    NUMBERBIN -> NUMBERBIN [label = "0, 1"]
+    NUMBERBIN -> NUMBEROCT [label = "2-7"]
+    NUMBERBIN -> NUMBERDEC [label = "8, 9"]
+    NUMBERBIN -> NUMBERHEX [label = "a-F"]
+    NUMBERBIN -> START [label = "b, B"]
+    NUMBERBIN -> START [label = "o, O"]
+    NUMBERBIN -> START [label = "d, D"]
+    NUMBERBIN -> START [label = "h, H"]
+    NUMBERBIN -> ER [label = "else"]
+
+    START -> NUMBEROCT [label = "2-7"]
+
+    NUMBEROCT -> NUMBEROCT [label = "2-7"]
+    NUMBEROCT -> NUMBERDEC [label = "_, 8, 9"]
+    NUMBEROCT -> NUMBERHEX [label = "a-F"]
+    NUMBEROCT -> START [label = "o, O"]
+    NUMBERBIN -> START [label = "d, D"]
+    NUMBERBIN -> START [label = "h, H"]
+
+    NUMBEROCT -> ER [label = "else"]
+
+    START -> NUMBERDEC [label = "8 9"]
+
+    NUMBERDEC -> NUMBERDEC [label = "digit"]
+    NUMBERDEC -> START [label = "_, d, D"]
+    NUMBERBIN -> START [label = "h, H"]
+    NUMBERDEC -> NUMBERHEX [label = "a-F"]
+    NUMBERDEC -> ER [label = "else"]
+
+    NUMBERHEX -> NUMBERHEX [label = "digit, a-F"]
+    NUMBERHEX -> START [label = "h, H"]
+    NUMBERHEX -> ER [label = "else"]
+}
