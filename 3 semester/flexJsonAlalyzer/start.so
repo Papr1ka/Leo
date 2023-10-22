@@ -1,0 +1,4 @@
+flex ./test.l
+gcc -g ./lex.yy.c -o test
+chmod +x ./test
+./test $1
