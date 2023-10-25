@@ -13,6 +13,7 @@ class States(Enum):
     ER = 0
     LETTERB = 11
     LETTERD = 12
+    LETTERE = 13
 
 
     #Состояния завершения разбора лексемы
@@ -21,5 +22,6 @@ class States(Enum):
     NUMBERDECEND = -3
     NUMBERHEXEND = -4
     # FRACTIONALEND = -5
+    NUMBERORDEREND = -6
 
 SEPARATORS = (" ", "\n", "\t")

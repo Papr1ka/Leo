@@ -15,8 +15,8 @@ if __name__ == '__main__':
     123d
     123D
     213h
-    FfabbDH
-    FfabbD
+    1fabbDH
+    1fabbD
     123e10
     123e+10
     123e-10
@@ -52,10 +52,11 @@ if __name__ == '__main__':
     .123E+10
     .123E-10
     123E-10
+    ident
     """
 
-    NUMBERTEST = """0110bh
-    """
+    # NUMBERTEST = """123.123
+    # """
 
     # lexer = Lexer(source)
     # for i in lexer.getLex():

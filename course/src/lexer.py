@@ -99,9 +99,43 @@ class Lexer():
                     yield States.NUMBERHEX, buffer
                     buffer = ""
 
+            elif self.state == States.LETTERB:
+                if new_state == States.NUMBERBINEND:
+                    yield States.NUMBERBIN, buffer
+                    buffer = ""
+                elif new_state == States.NUMBERHEXEND:
+                    yield States.NUMBERHEX, buffer
+                    buffer = ""
+
+            elif self.state == States.LETTERD:
+                if new_state == States.NUMBERDECEND:
+                    yield States.NUMBERDEC, buffer
+                    buffer = ""
+                elif new_state == States.NUMBERHEXEND:
+                    yield States.NUMBERHEX, buffer
+                    buffer = ""
+
+            elif self.state == States.LETTERE:
+                if new_state == States.NUMBERHEXEND:
+                    yield States.NUMBERHEX, buffer
+                    buffer = ""
+                elif new_state == States.NUMBERORDEREND:
+                    yield States.FRACTIONAL, buffer
+                    buffer = ""
+
             elif self.state == States.ER:
                 if new_state == States.START:
                     yield States.ER, buffer
+                    buffer = ""
+
+            elif self.state == States.FRACTIONAL:
+                if new_state == States.START:
+                    yield States.FRACTIONAL, buffer
+                    buffer = ""
+
+            elif self.state == States.NUMBERORDER:
+                if new_state == States.START:
+                    yield States.FRACTIONAL, buffer
                     buffer = ""
 
             if (new_state.value < 0):
