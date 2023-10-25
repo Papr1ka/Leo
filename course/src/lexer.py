@@ -168,6 +168,7 @@ class Lexer():
                     чтобы строка
                     '123e 10\n' была распознана как ошибочная лексема и лексема десятичного числа
                     """
+                    self.symbol += len(self.buffer)
                     yield self.give_lex(States.ER)
                     self.buffer = ""
                     self.state = States.START
