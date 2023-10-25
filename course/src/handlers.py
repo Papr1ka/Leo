@@ -1,14 +1,34 @@
 # from src.states import States
 from typing import TypeVar
-from src.states import States
+from src.states import States, SEPARATORS
 
 state_handler = TypeVar("state_handler")
 
-SEPARATORS = (
-    " ",
-    "\n",
-    "\t"
-)
+"""
+Далее описаны генераторы, обрабатывающие отдельные состояния
+state_{состояние}_handler
+
+состояние может быть простым, например identificator, start и тд.,
+так и сложным - state_letter_e_handler, имеющим свои подсостояния
+беспокоиться за это не нужно, внутренние состояния меняются самостоятельно
+
+Правила:
+    если обработчик вернул States.START, значит закончен разбор соответствующей лексемы
+    (если обработчик состояния IDENTIFICATOR, то лексема IDENTIFICATOR)
+    
+    если обработчик вернул состояние {STATE}END, значит закончен разбор лексемы {STATE}
+    
+    иначе обработчик возвращает новое состояние, которое может быть и таким же
+    
+    
+    состояния используются через оболочку renewable класса HandlerFactory,
+    метод get_handler которого сам оборачивает в renewable обработчик
+    этот обработчик позволяет каждый раз, когда генератор заканчивает свою работу
+    (возвращает состояние, отличное от того, которое он обрабатывает) подменять его на новый,
+    чтобы состояние сложных генераторов всегда было начальным
+    
+    Отдельно см. класс HandlerFactory
+"""
 
 def state_start_handler():
     while True:
@@ -278,12 +298,22 @@ HANDLERS = {
 
 
 class HandlerFactory:
+    """
+    Класс фабрика,
+    позволяет получать нужный обработчик без необходимости его обновления
+    """
+
+    # кэшированные генераторы
     cache: dict
 
     def __init__(self):
         self.cache = {}
 
     def get_handler(self, state: States):
+        """
+        Метод возвращает генератор из кэша или возвращает созданный, обернув его в оболочку renewable
+        в зависимости от состояния
+        """
         from_cache = self.cache.get(state, None)
         if (from_cache is not None):
             return from_cache
@@ -292,6 +322,10 @@ class HandlerFactory:
         return handler
 
     def init_handler(self, state):
+        """
+        Метод инициализирует генератор-обработчик состояния, оборачивает его в renewable,
+        инициализирует renewable и возвращает его
+        """
         global HANDLERS
         handler = HANDLERS.get(state)()
         handler.send(None)
@@ -300,12 +334,17 @@ class HandlerFactory:
         return handler
 
     def renewable(self, state: States, activated_generator: state_handler):
+        """
+        Генератор-делегатор,
+        следит за тем, когда подгенератор activated_generator возвращает состояния, соответствующие концу работы генератора
+        и кладёт в кэш новый инициализированный объект генератор, чтобы сбросить внутренние состояния для следующих лексем
+        """
         def wrapper(*args, **kwargs):
             new_state = None
             while True:
                 data = yield new_state
                 new_state = activated_generator.send(data)
-                if new_state == States.START or new_state == States.ER or new_state.value < 0:
+                if new_state != state:
                     self.cache[state] = self.init_handler(state)
                 next(activated_generator)
 
