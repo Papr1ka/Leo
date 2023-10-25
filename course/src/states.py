@@ -21,7 +21,7 @@ class States(Enum):
     NUMBEROCTEND = -2
     NUMBERDECEND = -3
     NUMBERHEXEND = -4
-    # FRACTIONALEND = -5
-    NUMBERORDEREND = -6
+    NUMBERORDEREND = -5
 
+# Границы лексем, список пока простой (не полный)
 SEPARATORS = (" ", "\n", "\t")

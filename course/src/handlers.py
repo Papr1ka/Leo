@@ -155,8 +155,10 @@ def state_number_oct_handler():
             yield States.FRACTIONAL
         elif char in ("o", "O"):
             yield States.START
-        elif char in ("d", "D") or char in SEPARATORS:
+        elif char in ("d", "D"):
             yield States.LETTERD
+        elif char in SEPARATORS:
+            yield States.NUMBERDECEND
         elif char in ("h", "H"):
             yield States.NUMBERHEXEND
         elif char in ("a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"):
