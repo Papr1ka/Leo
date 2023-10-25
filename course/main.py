@@ -1,16 +1,70 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
+from src.lexer import Lexer
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    source = """123 321 number i e"""
+
+    NUMBERTEST = """0110b
+    0110B
+    0110c
+
+    2352270o
+    2352270O
+    2352270c
+    123
+    123d
+    123D
+    213h
+    FfabbDH
+    FfabbD
+    123e10
+    123e+10
+    123e-10
+    123E10
+    123E+10
+    123E-10
+    1123ee10
+    123ee+10
+    213Ee-10
+    123Ee
+    123e
+    ..123e
+    123..123e
+    123.e
+    123.e.
+    123.e.10
+    123+e10
+    123-e10
+    
+    123.123
+    .123
+    123.123e10
+    123.123e+10
+    123.123e-10
+    123.123E10
+    123.123E+10
+    123.123E-10
+    
+    .123e10
+    .123e+10
+    .123e-10
+    .123E10
+    .123E+10
+    .123E-10
+    123E-10
+    """
+
+    NUMBERTEST = """0110bh
+    """
+
+    # lexer = Lexer(source)
+    # for i in lexer.getLex():
+    #     print(i)
+
+    lexer = Lexer(NUMBERTEST)
+    for i in lexer.getLex():
+        print(i)
+
+    print("Completed")
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

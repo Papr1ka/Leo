@@ -4,8 +4,14 @@ NUMBERBIN - двоичные числа
 NUMBEROCT - восьмиричные числа
 NUMBERDEC - десятичные числа
 NUMBERHEX - шестнадцатиричные числа
+NUMBERORDER - порядок вещественного числа
+NUMBERORDER2 - порядок вещественного числа, после символов + или -
+NUMBERORDER3 - порядок вещественного числа, после 1-й цифры или символа +-
+
 DOT - точка
 FRACTIONAL - дробная часть числа
+FRACTIONAL - дробная часть числа после 1-й цифры
+
 SEPARATOR_NOT_EQUALS - !=, !
 SEPARATOR_EQUALS - ==
 SEPARATOR_LTE - <, <=
