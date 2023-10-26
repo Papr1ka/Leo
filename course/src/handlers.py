@@ -77,7 +77,7 @@ def state_number_bin_handler():
         elif char in ("b", "B"):
             yield States.LETTERB
         elif char in ("o", "O"):
-            yield States.NUMBEROCTEND
+            yield States.LETTERO
         elif char in ("d", "D"):
             yield States.LETTERD
         elif char in SEPARATORS:
@@ -85,7 +85,7 @@ def state_number_bin_handler():
         elif char in ("a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"):
             yield States.NUMBERHEX
         elif char in ("h", "H"):
-            yield States.NUMBERHEXEND
+            yield States.LETTERH
         else:
             yield States.ER
 
@@ -98,7 +98,7 @@ def state_letter_b_handler():
         elif char.isdigit() or char in ("a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"):
             yield States.NUMBERHEX
         elif char in ("h", "H"):
-            yield States.NUMBERHEXEND
+            yield States.LETTERH
         else:
             yield States.ER
 
@@ -111,7 +111,7 @@ def state_letter_d_hander():
         elif char.isdigit() or char in ("a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"):
             yield States.NUMBERHEX
         elif char in ("h", "H"):
-            yield States.NUMBERHEXEND
+            yield States.LETTERH
         else:
             yield States.ER
 
@@ -138,7 +138,7 @@ def state_letter_e_hander():
             elif char in ("a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"):
                 yield States.NUMBERHEX
             elif char in ("h", "H"):
-                yield States.NUMBERHEXEND
+                yield States.LETTERH
             elif char.isdigit():
                 yield States.LETTERE
                 state = 1
@@ -148,7 +148,7 @@ def state_letter_e_hander():
             if char.isdigit():
                 yield States.LETTERE
             elif char in ("h", "H"):
-                yield States.NUMBERHEXEND
+                yield States.LETTERH
             elif char in ("a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"):
                 yield States.NUMBERHEX
             elif char in SEPARATORS:
@@ -160,6 +160,22 @@ def state_letter_e_hander():
                 yield States.LETTERE
             elif char in SEPARATORS:
                 yield States.NUMBERORDEREND
+
+def state_letter_h_handler():
+    while True:
+        char: str = yield
+        if char in SEPARATORS:
+            yield States.NUMBERHEXEND
+        else:
+            yield States.ER
+
+def state_letter_o_handler():
+    while True:
+        char: str = yield
+        if char in SEPARATORS:
+            yield States.NUMBEROCTEND
+        else:
+            yield States.ER
 
 def state_number_oct_handler():
     while True:
@@ -174,18 +190,17 @@ def state_number_oct_handler():
         elif char == ".":
             yield States.FRACTIONAL
         elif char in ("o", "O"):
-            yield States.START
+            yield States.LETTERO
         elif char in ("d", "D"):
             yield States.LETTERD
         elif char in SEPARATORS:
             yield States.NUMBERDECEND
         elif char in ("h", "H"):
-            yield States.NUMBERHEXEND
+            yield States.LETTERH
         elif char in ("a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"):
             yield States.NUMBERHEX
         else:
             yield States.ER
-
 def state_number_dec_handler():
     while True:
         char: str = yield
@@ -199,7 +214,7 @@ def state_number_dec_handler():
         elif char in ("d", "D"):
             yield States.LETTERD
         elif char in ("h", "H"):
-            yield States.NUMBERHEXEND
+            yield States.LETTERH
         elif char in ("a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"):
             yield States.NUMBERHEX
         elif char in SEPARATORS:
@@ -214,7 +229,7 @@ def state_number_hex_handler():
         if char.isdigit() or char in ("a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"):
             yield States.NUMBERHEX
         elif char in ("h", "H"):
-            yield States.START
+            yield States.LETTERH
         else:
             yield States.ER
 
@@ -293,6 +308,8 @@ HANDLERS = {
     States.LETTERB: state_letter_b_handler,
     States.LETTERD: state_letter_d_hander,
     States.LETTERE: state_letter_e_hander,
+    States.LETTERH: state_letter_h_handler,
+    States.LETTERO: state_letter_o_handler,
     States.ER: state_er_handler,
 }
 

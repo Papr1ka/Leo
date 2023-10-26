@@ -14,6 +14,8 @@ class States(Enum):
     LETTERB = 11
     LETTERD = 12
     LETTERE = 13
+    LETTERH = 14
+    LETTERO = 15
 
 
     #Состояния завершения разбора лексемы

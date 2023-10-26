@@ -73,14 +73,15 @@ ident
     with open("./examples/ex1") as file:
         file_contents = "\n".join(file.readlines())
     print(file_contents)
-    lexer = Lexer(file_contents)
+    lexer = Lexer(NUMBERTEST)
     pattern = "{:<24} {:<20} {:<8} {:<8}"
 
     print(pattern.format("Lex type", "Lex", "Line", "Symbol"))
     print("{:-<75}".format(""))
     for i in lexer.get_lex():
-        print(pattern.format(*i))
-
+        # print(pattern.format(*i))
+        # print(next(lexer.get_lex()))
+        print(i)
     print("Completed")
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

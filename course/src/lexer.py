@@ -91,26 +91,18 @@ class Lexer():
             elif self.state == States.NUMBERBIN:
                 if new_state == States.START:
                     yield self.give_lex(States.NUMBERBIN)
-                elif new_state == States.NUMBEROCTEND:
-                    yield self.give_lex(States.NUMBEROCT)
                 elif new_state == States.NUMBERDECEND:
                     yield self.give_lex(States.NUMBERDEC)
-                elif new_state == States.NUMBERHEXEND:
-                    yield self.give_lex(States.NUMBERHEX)
 
             elif self.state == States.NUMBEROCT:
                 if new_state == States.START:
                     yield self.give_lex(States.NUMBEROCT)
                 elif new_state == States.NUMBERDECEND:
                     yield self.give_lex(States.NUMBERDEC)
-                elif new_state == States.NUMBERHEXEND:
-                    yield self.give_lex(States.NUMBERHEX)
 
             elif self.state == States.NUMBERDEC:
                 if new_state == States.START:
                     yield self.give_lex(States.NUMBERDEC)
-                elif new_state == States.NUMBERHEXEND:
-                    yield self.give_lex(States.NUMBERHEX)
 
             elif self.state == States.NUMBERHEX:
                 if new_state == States.START:
@@ -119,20 +111,22 @@ class Lexer():
             elif self.state == States.LETTERB:
                 if new_state == States.NUMBERBINEND:
                     yield self.give_lex(States.NUMBERBIN)
-                elif new_state == States.NUMBERHEXEND:
-                    yield self.give_lex(States.NUMBERHEX)
 
             elif self.state == States.LETTERD:
                 if new_state == States.NUMBERDECEND:
                     yield self.give_lex(States.NUMBERDEC)
-                elif new_state == States.NUMBERHEXEND:
-                    yield self.give_lex(States.NUMBERHEX)
 
             elif self.state == States.LETTERE:
+                if new_state == States.NUMBERORDEREND:
+                    yield self.give_lex(States.FRACTIONAL)
+
+            elif self.state == States.LETTERH:
                 if new_state == States.NUMBERHEXEND:
                     yield self.give_lex(States.NUMBERHEX)
-                elif new_state == States.NUMBERORDEREND:
-                    yield self.give_lex(States.FRACTIONAL)
+
+            elif self.state == States.LETTERO:
+                if new_state == States.NUMBEROCTEND:
+                    yield self.give_lex(States.NUMBEROCT)
 
             elif self.state == States.FRACTIONAL:
                 if new_state == States.START:
@@ -147,10 +141,12 @@ class Lexer():
                     yield self.give_lex(States.ER)
 
 
-            if (new_state == States.START or new_state.value < 0):
+            if new_state == States.START or new_state.value < 0:
                 # Если следующее состояние стартовое, или соответствует завершению определённой лексемы,
                 if self.state != States.START:
-                    self.unget_char()
+                    # self.unget_char()
+                    pass
+
                 self.symbol += len(self.buffer)
 
                 self.state = States.START
