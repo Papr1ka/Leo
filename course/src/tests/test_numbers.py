@@ -89,8 +89,15 @@ class TestLexer(TestCase):
         self.assertEqual(next(g)[0:2], (States.ER, '123.e'))
         self.assertEqual(next(g)[0:2], (States.ER, '123.e.'))
         self.assertEqual(next(g)[0:2], (States.ER, '123.e.10'))
-        self.assertEqual(next(g)[0:2], (States.ER, '123+e10'))
-        self.assertEqual(next(g)[0:2], (States.ER, '123-e10'))
+
+
+        self.assertEqual(next(g)[0:2], (States.NUMBER_DEC, '123'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_PLUS, '+'))
+        self.assertEqual(next(g)[0:2], (States.IDENTIFIER, 'e10'))
+
+        self.assertEqual(next(g)[0:2], (States.NUMBER_DEC, '123'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_MINUS, '-'))
+        self.assertEqual(next(g)[0:2], (States.IDENTIFIER, 'e10'))
 
         self.assertEqual(next(g)[0:2], (States.FRACTIONAL, '123.123'))
         self.assertEqual(next(g)[0:2], (States.FRACTIONAL, '.123'))

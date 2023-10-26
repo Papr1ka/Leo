@@ -18,6 +18,7 @@ class States(Enum):
     LETTER_O = 15
 
     SEPARATOR_NOT_EQUALS = 16
+    SEPARATOR_NOT = 32
     SEPARATOR_EQUALS = 17
     SEPARATOR_LTE = 18
     SEPARATOR_GTE = 19
@@ -50,6 +51,7 @@ class States(Enum):
     SEPARATOR_LEFT_FIGURE_BRACKET_END = -12
     SEPARATOR_RIGHT_FIGURE_BRACKET_END = -13
     SEPARATOR_SEMICOLON_END = -14
+    SEPARATOR_NOT_EQUALS_END = -15
     STATE_LEX_END_HELPER = -100
 # Границы лексем, список пока простой (не полный)
 BASE_SEPARATORS = (
@@ -76,4 +78,9 @@ SEPARATORS = (
     "}",
     ":",
     ";",
+)
+
+SEPARATORS_STATES = (
+    States.DELIM,
+    States.SEPARATOR_NOT
 )

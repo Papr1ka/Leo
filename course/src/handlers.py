@@ -47,6 +47,8 @@ def state_start_handler():
             yield States.START
         elif char in ("(", ")", "+", "-", "*", "/", "{", "}", ";"):
             yield States.DELIM
+        elif char == "!":
+            yield States.SEPARATOR_NOT
         else:
             yield States.ER
 
@@ -92,6 +94,20 @@ def state_delim_handler():
             yield state
         else:
             yield state
+
+def state_separator_not_handler():
+    state = 0
+    while True:
+        char: str = yield
+        if state == 0:
+            if char == "=":
+                state = States.SEPARATOR_NOT_EQUALS_END
+            else:
+                state = States.START
+            yield States.SEPARATOR_NOT
+        else:
+            yield state
+
 
 def state_number_bin_handler():
     while True:
@@ -344,6 +360,7 @@ HANDLERS = {
     States.LETTER_H: state_letter_h_handler,
     States.LETTER_O: state_letter_o_handler,
     States.DELIM: state_delim_handler,
+    States.SEPARATOR_NOT: state_separator_not_handler,
     States.ER: state_er_handler,
 }
 

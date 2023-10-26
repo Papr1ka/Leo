@@ -1,4 +1,4 @@
-from src.states import States, SEPARATORS, BASE_SEPARATORS
+from src.states import States, SEPARATORS, BASE_SEPARATORS, SEPARATORS_STATES
 from src.handlers import HandlerFactory
 
 
@@ -81,12 +81,20 @@ class Lexer():
             if char not in BASE_SEPARATORS:
                 # аккумуляция символьного значения лексемы
                 # if new_state != States.START and new_state.value >= 0:
-                if not (char in SEPARATORS and self.state != States.DELIM):
+                if ((char not in SEPARATORS and self.state not in SEPARATORS_STATES) or (
+                    char in SEPARATORS and self.state in SEPARATORS_STATES) or (
+                    self.state in (States.LETTER_E, States.NUMBER_ORDER, States.ER)) or (
+                    new_state == States.ER)):
                     self.buffer += char
+
+                # if char not in SEPARATORS or self.state in SEPARATORS_STATES:
+                #     self.buffer += char
+                # if self.state in SEPARATORS_STATES and char not in SEPARATORS:
+                #     self.buffer = self.buffer[:-1]
 
             # отлавливаем успешные распознавания
             if self.state == States.START:
-                if new_state == States.DELIM:
+                if new_state in SEPARATORS_STATES:
                     self.unget_char()
                     self.buffer = ""
 
@@ -113,6 +121,12 @@ class Lexer():
             elif self.state == States.IDENTIFIER:
                 if new_state == States.START:
                     yield self.give_lex(States.IDENTIFIER)
+
+            elif self.state == States.SEPARATOR_NOT:
+                if new_state == States.START:
+                    yield self.give_lex(States.SEPARATOR_NOT)
+                elif new_state == States.SEPARATOR_NOT_EQUALS_END:
+                    yield self.give_lex(States.SEPARATOR_NOT_EQUALS)
 
             elif self.state == States.NUMBER_BIN:
                 if new_state == States.START:
