@@ -45,6 +45,13 @@ class Lexer():
         self.index += 1
         return char
 
+    def unget_char(self):
+        """
+        Метод декрементирует указатель на символ строки
+        """
+        if self.index > 0:
+            self.index -= 1
+
     def give_lex(self, state: States):
         """
         Метод возвращает кортеж из всех известных параметрах о лексеме
@@ -142,6 +149,8 @@ class Lexer():
 
             if (new_state == States.START or new_state.value < 0):
                 # Если следующее состояние стартовое, или соответствует завершению определённой лексемы,
+                if self.state != States.START:
+                    self.unget_char()
                 self.symbol += len(self.buffer)
 
                 self.state = States.START

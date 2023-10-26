@@ -1,5 +1,6 @@
 from src.lexer import Lexer
 
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     source = """123 321 number i e"""
@@ -67,9 +68,18 @@ ident
     # for i in lexer.getLex():
     #     print(i)
 
-    lexer = Lexer(NUMBERTEST)
+    file_contents = ""
+
+    with open("./examples/ex1") as file:
+        file_contents = "\n".join(file.readlines())
+    print(file_contents)
+    lexer = Lexer(file_contents)
+    pattern = "{:<24} {:<20} {:<8} {:<8}"
+
+    print(pattern.format("Lex type", "Lex", "Line", "Symbol"))
+    print("{:-<75}".format(""))
     for i in lexer.get_lex():
-        print(i)
+        print(pattern.format(*i))
 
     print("Completed")
 
