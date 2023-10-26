@@ -41,7 +41,7 @@ def stateStart():
         if char.isdigit():
             yield States.NUMBER
         elif char in ("e", "E"):
-            yield States.NUMBERORDER
+            yield States.NUMBER_ORDER
         elif char.isalpha():
             yield States.IDENT
         else:
@@ -85,22 +85,22 @@ def stateNumberOrder():
         char: str = yield
         if state == 0:
             if char in ("+", "-"):
-                yield States.NUMBERORDER
+                yield States.NUMBER_ORDER
                 state = 1
             elif char.isdigit():
-                yield States.NUMBERORDER
+                yield States.NUMBER_ORDER
                 state = 2
             else:
                 yield States.ER
         elif state == 1:
             if char.isdigit():
-                yield States.NUMBERORDER
+                yield States.NUMBER_ORDER
                 state = 2
             else:
                 yield States.ER
         elif state == 2:
             if char.isdigit():
-                yield States.NUMBERORDER
+                yield States.NUMBER_ORDER
             elif char in SEPARATORS:
                 yield States.START
             else:
@@ -113,7 +113,7 @@ states = {
     States.IDENT: stateIdent(),
     States.NUMBER: stateNumber(),
     States.ER: stateEr(),
-    States.NUMBERORDER: stateNumberOrder(),
+    States.NUMBER_ORDER: stateNumberOrder(),
 }
 
 def getLex():
@@ -171,11 +171,11 @@ def getLex():
                 yield States.NUMBER, buffer
                 buffer = ""
 
-        elif state == States.NUMBERORDER:
+        elif state == States.NUMBER_ORDER:
             state = handle(handler, char)
 
             if state == States.START:
-                yield States.NUMBERORDER, buffer
+                yield States.NUMBER_ORDER, buffer
                 buffer = ""
 
         elif state == States.ER:
