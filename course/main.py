@@ -14,7 +14,7 @@ IDENT{0}
 """
     NUMBERTEST = """
 (a!b)
-(a!= b)
+(a!=b)
 """
     # lexer = Lexer(source)
     # for i in lexer.getLex():
