@@ -30,27 +30,49 @@ state_{состояние}_handler
 """
 
 def state_start_handler():
+    state = 0
     while True:
         char: str = yield
 
-        if char.isalpha():
-            yield States.IDENTIFIER
-        elif char in ("0", "1"):
-            yield States.NUMBER_BIN
-        elif char in ("2", "3", "4", "5", "6", "7"):
-            yield States.NUMBER_OCT
-        elif char in ("8", "9"):
-            yield States.NUMBER_DEC
-        elif char == ".":
-            yield States.FRACTIONAL
-        elif char in BASE_SEPARATORS:
-            yield States.START
-        elif char in ("(", ")", "+", "-", "*", "/", "{", "}", ";"):
-            yield States.DELIM
-        elif char == "!":
-            yield States.SEPARATOR_NOT
+        if state == 0:
+            if char.isalpha():
+                yield States.IDENTIFIER
+            elif char in ("0", "1"):
+                yield States.NUMBER_BIN
+            elif char in ("2", "3", "4", "5", "6", "7"):
+                yield States.NUMBER_OCT
+            elif char in ("8", "9"):
+                yield States.NUMBER_DEC
+            elif char == ".":
+                yield States.FRACTIONAL
+            elif char in BASE_SEPARATORS:
+                yield States.START
+            elif char in ("(", ")", "+", "-", "*", "/", "{", "}", ";"):
+                if char == "(":
+                    state = States.SEPARATOR_LEFT_BRACKET, States.START
+                elif char == ")":
+                    state = States.SEPARATOR_RIGHT_BRACKET, States.START
+                elif char == "+":
+                    state = States.SEPARATOR_PLUS, States.START
+                elif char == "-":
+                    state = States.SEPARATOR_MINUS, States.START
+                elif char == "*":
+                    state = States.SEPARATOR_MULTIPLICATION, States.START
+                elif char == "/":
+                    state = States.SEPARATOR_DIVISION, States.START
+                elif char == "{":
+                    state = States.SEPARATOR_LEFT_FIGURE_BRACKET, States.START
+                elif char == "}":
+                    state = States.SEPARATOR_RIGHT_FIGURE_BRACKET, States.START
+                elif char == ";":
+                    state = States.SEPARATOR_SEMICOLON, States.START
+                yield States.START
+            elif char == "!":
+                yield States.SEPARATOR_NOT
+            else:
+                yield States.ER
         else:
-            yield States.ER
+            yield state
 
 def state_identificator_handler():
     while True:
@@ -105,14 +127,8 @@ def state_separator_not_handler():
     while True:
         char: str = yield
         if state == 0:
-            if char == "!":
+            if char == "=":
                 state = 1
-                yield States.SEPARATOR_NOT
-            else:
-                yield States.ER
-        elif state == 1:
-            if char == '=':
-                state = 2
                 yield States.SEPARATOR_NOT
             else:
                 yield States.SEPARATOR_NOT, States.START

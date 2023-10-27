@@ -107,8 +107,8 @@ class Lexer():
             if lex != States.START:
                 yield self.give_lex(lex)
 
-            if self.state == States.START and char not in BASE_SEPARATORS:
-                self.unget_char()
+            # if self.state == States.START and char not in BASE_SEPARATORS:
+            #     self.unget_char()
 
             #
             # if char not in BASE_SEPARATORS:
@@ -213,10 +213,10 @@ class Lexer():
             #     if new_state == States.START:
             #         yield self.give_lex(States.ER)
 
-            if self.state != States.START and char not in BASE_SEPARATORS:
+            if char not in BASE_SEPARATORS:
                 self.buffer += char
 
-            if new_state == States.START:
+            if lex != States.START:
                 # Если следующее состояние стартовое, или соответствует завершению определённой лексемы,
 
                 self.symbol += len(self.buffer)
