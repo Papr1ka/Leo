@@ -102,6 +102,8 @@ class Lexer():
             try:
                 char = self.get_char()
             except StopIteration:
+                if self.state == States.SEPARATOR_COMMENT:
+                    yield self.give_lex(States.ER)
                 return
             lex: States = States.START
             # генератор, который будет заниматься разбором следующего символа, выбирается в зависимости от состояния

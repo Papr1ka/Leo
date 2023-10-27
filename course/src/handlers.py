@@ -209,17 +209,15 @@ def state_separator_comment_handler():
         elif state == 1:
             if char == "*":
                 state = 2
-                yield States.SEPARATOR_COMMENT
-            elif char == "/":
-                yield States.ER
-            else:
-                yield States.SEPARATOR_COMMENT
+            yield States.SEPARATOR_COMMENT
         elif state == 2:
             if char == "/":
                 state = 3
-                yield States.SEPARATOR_COMMENT
+            elif char == "*":
+                pass
             else:
-                yield States.ER
+                state = 1
+            yield States.SEPARATOR_COMMENT
         else:
             yield States.STATE_NULL, States.START
 

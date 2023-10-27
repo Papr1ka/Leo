@@ -35,9 +35,26 @@ a:=b
     # for i in lexer.getLex():
     #     print(i)
 
+    NUMBERTEST = """
+1
+/*abcd*/
+2
+/***/
+3
+/*/*/
+4
+/******
+*
+/
+*
+* /
+5
+*/
+"""
+
     file_contents = ""
 
-    with open("./examples/ex1") as file:
+    with open("./src/tests/test_separators.txt") as file:
         file_contents = "\n".join(file.readlines())
 
     lexer = Lexer(NUMBERTEST)
@@ -50,7 +67,7 @@ a:=b
         print(pattern.format(*i))
         # print(next(lexer.get_lex()))
         guard += 1
-        if guard >= 100:
+        if guard >= 300:
             print("Error: Force stoped by guard")
             break
     print("Completed")
