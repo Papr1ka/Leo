@@ -24,10 +24,12 @@ b>a
 >>>=>
 a||b
 |||a
+/*всякая ересь*/
 a&&b
 &&&b
 a:=b
 :=:b
+/*asd*/
 """
     # lexer = Lexer(source)
     # for i in lexer.getLex():

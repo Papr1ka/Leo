@@ -39,22 +39,7 @@ class States(Enum):
     SEPARATOR_COMMENT = 35
     DELIM = 50
 
-    #Состояния завершения разбора лексемы
-    NUMBER_BIN_END = -1
-    NUMBER_OCT_END = -2
-    NUMBER_DEC_END = -3
-    NUMBER_HEX_END = -4
-    NUMBER_ORDER_END = -5
-    SEPARATOR_LEFT_BRACKET_END = -6
-    SEPARATOR_RIGHT_BRACKET_END = -7
-    SEPARATOR_PLUS_END = -8
-    SEPARATOR_MINUS_END = -9
-    SEPARATOR_MULTIPLICATION_END = -10
-    SEPARATOR_DIVISION_END = -11
-    SEPARATOR_LEFT_FIGURE_BRACKET_END = -12
-    SEPARATOR_RIGHT_FIGURE_BRACKET_END = -13
-    SEPARATOR_SEMICOLON_END = -14
-    SEPARATOR_NOT_EQUALS_END = -15
+    STATE_NULL = -1 # вспомогательное состояние, когда буфер накопился, но это не лексема (комментарий)
     STATE_LEX_END_HELPER = -100
 # Границы лексем, список пока простой (не полный)
 BASE_SEPARATORS = (

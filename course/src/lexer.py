@@ -113,7 +113,7 @@ class Lexer():
             if isinstance(new_state, tuple):
                 lex, new_state = new_state
 
-            if lex != States.START:
+            if lex != States.START and lex != States.STATE_NULL:
                 yield self.give_lex(lex)
 
 

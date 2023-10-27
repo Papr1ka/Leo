@@ -51,7 +51,7 @@ def state_start_handler():
                 yield States.FRACTIONAL
             elif char in BASE_SEPARATORS:
                 yield States.START
-            elif char in ("(", ")", "+", "-", "*", "/", "{", "}", ";"):
+            elif char in ("(", ")", "+", "-", "*", "{", "}", ";"):
                 if char == "(":
                     state = States.SEPARATOR_LEFT_BRACKET, States.START
                 elif char == ")":
@@ -62,8 +62,6 @@ def state_start_handler():
                     state = States.SEPARATOR_MINUS, States.START
                 elif char == "*":
                     state = States.SEPARATOR_MULTIPLICATION, States.START
-                elif char == "/":
-                    state = States.SEPARATOR_DIVISION, States.START
                 elif char == "{":
                     state = States.SEPARATOR_LEFT_FIGURE_BRACKET, States.START
                 elif char == "}":
@@ -194,6 +192,11 @@ def state_separator_assignment_handler():
 
 def state_separator_comment_handler():
     state = 0
+    """
+    state = 0 - символ деления или начало комментария
+    state = 1 - тело комментария
+    state = 2 - конец комментария
+    """
     while True:
         char: str = yield
 
@@ -202,12 +205,23 @@ def state_separator_comment_handler():
                 state = 1
                 yield States.SEPARATOR_COMMENT
             else:
-                yield States.ER
-        else:
+                yield States.SEPARATOR_DIVISION, States.START
+        elif state == 1:
             if char == "*":
+                state = 2
                 yield States.SEPARATOR_COMMENT
+            elif char == "/":
+                yield States.ER
             else:
                 yield States.SEPARATOR_COMMENT
+        elif state == 2:
+            if char == "/":
+                state = 3
+                yield States.SEPARATOR_COMMENT
+            else:
+                yield States.ER
+        else:
+            yield States.STATE_NULL, States.START
 
 
 def state_separator_comment_end_handler():
@@ -507,6 +521,7 @@ HANDLERS = {
     States.SEPARATOR_OR: state_separator_or_handler,
     States.SEPARATOR_AND: state_separator_and_handler,
     States.SEPARATOR_ASSIGNMENT: state_separator_assignment_handler,
+    States.SEPARATOR_COMMENT: state_separator_comment_handler,
     States.ER: state_er_handler,
 }
 
