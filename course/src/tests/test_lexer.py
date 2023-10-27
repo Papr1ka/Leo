@@ -122,5 +122,98 @@ class TestLexer(TestCase):
         self.assertEqual(next(g)[0:2], (States.NUMBER_HEX, '123E90H'))
         self.assertEqual(next(g)[0:2], (States.NUMBER_HEX, '123EBBD0H'))
 
+    def test_separators(self):
+        with open("./src/tests/test_separators.txt") as file:
+            data = "".join(file.readlines())
+
+        lexer = Lexer(data).get_lex()
+        g = iter(lexer)
+
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LEFT_BRACKET, '('))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LEFT_BRACKET, '('))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LEFT_BRACKET, '('))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_NOT, '!'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LEFT_BRACKET, '('))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_NOT, '!'))
+
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_RIGHT_BRACKET, ')'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_RIGHT_BRACKET, ')'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_RIGHT_BRACKET, ')'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_NOT, '!'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_RIGHT_BRACKET, ')'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_NOT, '!'))
+
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LEFT_BRACKET, '('))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LEFT_BRACKET, '('))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_RIGHT_BRACKET, ')'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LEFT_BRACKET, '('))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_RIGHT_BRACKET, ')'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_RIGHT_BRACKET, ')'))
+
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_NOT_EQUALS, '!='))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_NOT, '!'))
+        self.assertEqual(next(g)[0:2], (States.ER, '=!'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_NOT, '!'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_NOT_EQUALS, '!='))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_NOT_EQUALS, '!='))
+        self.assertEqual(next(g)[0:2], (States.ER, '='))
+        self.assertEqual(next(g)[0:2], (States.ER, '=!'))
+        self.assertEqual(next(g)[0:2], (States.ER, '='))
+
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_EQUALS, '=='))
+        self.assertEqual(next(g)[0:2], (States.ER, '='))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_EQUALS, '=='))
+        self.assertEqual(next(g)[0:2], (States.ER, '='))
+
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LT, '<'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LEFT_BRACKET, '('))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LT, '<'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_RIGHT_BRACKET, ')'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LEFT_BRACKET, '('))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LT, '<'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_NOT_EQUALS, '!='))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_RIGHT_BRACKET, ')'))
+
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LTE, '<='))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LT, '<'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LTE, '<='))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LTE, '<='))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LTE, '<='))
+        self.assertEqual(next(g)[0:2], (States.ER, '=<'))
+        self.assertEqual(next(g)[0:2], (States.ER, '='))
+
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_GT, '>'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LEFT_BRACKET, '('))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_GT, '>'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_RIGHT_BRACKET, ')'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LEFT_BRACKET, '('))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_GT, '>'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_NOT_EQUALS, '!='))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_RIGHT_BRACKET, ')'))
+
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_GTE, '>='))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_GT, '>'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_GTE, '>='))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_GTE, '>='))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_GTE, '>='))
+        self.assertEqual(next(g)[0:2], (States.ER, '=>'))
+        self.assertEqual(next(g)[0:2], (States.ER, '='))
+
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LT, '<'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LTE, '<='))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_GT, '>'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_GT, '>'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LTE, '<='))
+        self.assertEqual(next(g)[0:2], (States.ER, '=>'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LT, '<'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LTE, '<='))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_GT, '>'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_GT, '>'))
+
+
+
+
+
+
 if __name__ == "__main__":
     TestLexer().run()
