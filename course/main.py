@@ -12,7 +12,7 @@ IDENT)
 IDENT{0}
 (
 """
-    NUMBERTEST = """
+    NUMBERTEST = """0110b
 (a!b)
 (a!=b)
 """

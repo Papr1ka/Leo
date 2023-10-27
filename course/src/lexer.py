@@ -80,8 +80,7 @@ class Lexer():
         Метод возвращает кортеж из всех известных параметрах о лексеме
         Все возвращаемые анализатором лексемы проходят через эту функцию
         """
-        if self.state != States.DELIM:
-            self.unget_char()
+        self.unget_char()
         return state, self.buffer, self.line, self.symbol
 
     def get_lex(self):
@@ -89,26 +88,37 @@ class Lexer():
         Генератор
         Возвращает очередную лексему через вызов give_lex
         """
+
         while True:
             try:
                 char = self.get_char()
             except StopIteration:
                 return
-
+            lex: States = States.START
             # генератор, который будет заниматься разбором следующего символа, выбирается в зависимости от состояния
             handler = self.factory.get_handler(self.state)
 
             # новое состояние, в которое нам следует перейти
             new_state = handler.send(char)
 
-            if char not in BASE_SEPARATORS:
-                # аккумуляция символьного значения лексемы
-                # if new_state != States.START and new_state.value >= 0:
-                if ((char not in SEPARATORS and self.state not in SEPARATORS_STATES) or (
-                    char in SEPARATORS and self.state in SEPARATORS_STATES) or (
-                    self.state in (States.LETTER_E, States.NUMBER_ORDER, States.ER)) or (
-                    new_state == States.ER)):
-                    self.buffer += char
+            if isinstance(new_state, tuple):
+                lex, new_state = new_state
+
+            if lex != States.START:
+                yield self.give_lex(lex)
+
+            if self.state == States.START and char not in BASE_SEPARATORS:
+                self.unget_char()
+
+            #
+            # if char not in BASE_SEPARATORS:
+            #     # аккумуляция символьного значения лексемы
+            #     # if new_state != States.START and new_state.value >= 0:
+            #     if ((char not in SEPARATORS and self.state not in SEPARATORS_STATES) or (
+            #         char in SEPARATORS and self.state in SEPARATORS_STATES) or (
+            #         self.state in (States.LETTER_E, States.NUMBER_ORDER, States.ER)) or (
+            #         new_state == States.ER)):
+            #         self.buffer += char
 
                 # if char not in SEPARATORS or self.state in SEPARATORS_STATES:
                 #     self.buffer += char
@@ -116,106 +126,103 @@ class Lexer():
                 #     self.buffer = self.buffer[:-1]
 
             # отлавливаем успешные распознавания
-            if self.state == States.START:
-                if new_state in SEPARATORS_STATES:
-                    self.unget_char()
-                    self.buffer = ""
+            # if self.state == States.START:
+            #     if new_state in SEPARATORS_STATES:
+            #         self.unget_char()
+            #         self.buffer = ""
+            #
+            # elif self.state == States.DELIM:
+            #     if new_state == States.SEPARATOR_LEFT_BRACKET_END:
+            #         yield self.give_lex(States.SEPARATOR_LEFT_BRACKET)
+            #     elif new_state == States.SEPARATOR_RIGHT_BRACKET_END:
+            #         yield self.give_lex(States.SEPARATOR_RIGHT_BRACKET)
+            #     elif new_state == States.SEPARATOR_PLUS_END:
+            #         yield self.give_lex(States.SEPARATOR_PLUS)
+            #     elif new_state == States.SEPARATOR_MINUS_END:
+            #         yield self.give_lex(States.SEPARATOR_MINUS)
+            #     elif new_state == States.SEPARATOR_MULTIPLICATION_END:
+            #         yield self.give_lex(States.SEPARATOR_MULTIPLICATION)
+            #     elif new_state == States.SEPARATOR_DIVISION_END:
+            #         yield self.give_lex(States.SEPARATOR_DIVISION)
+            #     elif new_state == States.SEPARATOR_LEFT_FIGURE_BRACKET_END:
+            #         yield self.give_lex(States.SEPARATOR_LEFT_FIGURE_BRACKET)
+            #     elif new_state == States.SEPARATOR_RIGHT_FIGURE_BRACKET_END:
+            #         yield self.give_lex(States.SEPARATOR_RIGHT_FIGURE_BRACKET)
+            #     elif new_state == States.SEPARATOR_SEMICOLON_END:
+            #         yield States.SEPARATOR_SEMICOLON
+            #
+            # elif self.state == States.IDENTIFIER:
+            #     if new_state == States.START:
+            #         yield self.give_lex(States.IDENTIFIER)
+            #
+            # elif self.state == States.SEPARATOR_NOT:
+            #     if new_state == States.START:
+            #         yield self.give_lex(States.SEPARATOR_NOT)
+            #     elif new_state == States.SEPARATOR_NOT_EQUALS_END:
+            #         yield self.give_lex(States.SEPARATOR_NOT_EQUALS)
+            #
+            # elif self.state == States.NUMBER_BIN:
+            #     if new_state == States.START:
+            #         yield self.give_lex(States.NUMBER_BIN)
+            #     elif new_state == States.NUMBER_DEC_END:
+            #         yield self.give_lex(States.NUMBER_DEC)
+            #
+            # elif self.state == States.NUMBER_OCT:
+            #     if new_state == States.START:
+            #         yield self.give_lex(States.NUMBER_OCT)
+            #     elif new_state == States.NUMBER_DEC_END:
+            #         yield self.give_lex(States.NUMBER_DEC)
+            #
+            # elif self.state == States.NUMBER_DEC:
+            #     if new_state == States.START:
+            #         yield self.give_lex(States.NUMBER_DEC)
+            #
+            # elif self.state == States.NUMBER_HEX:
+            #     if new_state == States.START:
+            #         yield self.give_lex(States.NUMBER_HEX)
+            #
+            # elif self.state == States.LETTER_B:
+            #     if new_state == States.NUMBER_BIN_END:
+            #         yield self.give_lex(States.NUMBER_BIN)
+            #
+            # elif self.state == States.LETTER_D:
+            #     if new_state == States.NUMBER_DEC_END:
+            #         yield self.give_lex(States.NUMBER_DEC)
+            #
+            # elif self.state == States.LETTER_E:
+            #     if new_state == States.NUMBER_ORDER_END:
+            #         yield self.give_lex(States.FRACTIONAL)
+            #
+            # elif self.state == States.LETTER_H:
+            #     if new_state == States.NUMBER_HEX_END:
+            #         yield self.give_lex(States.NUMBER_HEX)
+            #
+            # elif self.state == States.LETTER_O:
+            #     if new_state == States.NUMBER_OCT_END:
+            #         yield self.give_lex(States.NUMBER_OCT)
+            #
+            # elif self.state == States.FRACTIONAL:
+            #     if new_state == States.START:
+            #         yield self.give_lex(States.FRACTIONAL)
+            #
+            # elif self.state == States.NUMBER_ORDER:
+            #     if new_state == States.START:
+            #         yield self.give_lex(States.FRACTIONAL)
+            #
+            # elif self.state == States.ER:
+            #     if new_state == States.START:
+            #         yield self.give_lex(States.ER)
 
-            elif self.state == States.DELIM:
-                if new_state == States.SEPARATOR_LEFT_BRACKET_END:
-                    yield self.give_lex(States.SEPARATOR_LEFT_BRACKET)
-                elif new_state == States.SEPARATOR_RIGHT_BRACKET_END:
-                    yield self.give_lex(States.SEPARATOR_RIGHT_BRACKET)
-                elif new_state == States.SEPARATOR_PLUS_END:
-                    yield self.give_lex(States.SEPARATOR_PLUS)
-                elif new_state == States.SEPARATOR_MINUS_END:
-                    yield self.give_lex(States.SEPARATOR_MINUS)
-                elif new_state == States.SEPARATOR_MULTIPLICATION_END:
-                    yield self.give_lex(States.SEPARATOR_MULTIPLICATION)
-                elif new_state == States.SEPARATOR_DIVISION_END:
-                    yield self.give_lex(States.SEPARATOR_DIVISION)
-                elif new_state == States.SEPARATOR_LEFT_FIGURE_BRACKET_END:
-                    yield self.give_lex(States.SEPARATOR_LEFT_FIGURE_BRACKET)
-                elif new_state == States.SEPARATOR_RIGHT_FIGURE_BRACKET_END:
-                    yield self.give_lex(States.SEPARATOR_RIGHT_FIGURE_BRACKET)
-                elif new_state == States.SEPARATOR_SEMICOLON_END:
-                    yield States.SEPARATOR_SEMICOLON
+            if self.state != States.START and char not in BASE_SEPARATORS:
+                self.buffer += char
 
-            elif self.state == States.IDENTIFIER:
-                if new_state == States.START:
-                    yield self.give_lex(States.IDENTIFIER)
-
-            elif self.state == States.SEPARATOR_NOT:
-                if new_state == States.START:
-                    yield self.give_lex(States.SEPARATOR_NOT)
-                elif new_state == States.SEPARATOR_NOT_EQUALS_END:
-                    yield self.give_lex(States.SEPARATOR_NOT_EQUALS)
-
-            elif self.state == States.NUMBER_BIN:
-                if new_state == States.START:
-                    yield self.give_lex(States.NUMBER_BIN)
-                elif new_state == States.NUMBER_DEC_END:
-                    yield self.give_lex(States.NUMBER_DEC)
-
-            elif self.state == States.NUMBER_OCT:
-                if new_state == States.START:
-                    yield self.give_lex(States.NUMBER_OCT)
-                elif new_state == States.NUMBER_DEC_END:
-                    yield self.give_lex(States.NUMBER_DEC)
-
-            elif self.state == States.NUMBER_DEC:
-                if new_state == States.START:
-                    yield self.give_lex(States.NUMBER_DEC)
-
-            elif self.state == States.NUMBER_HEX:
-                if new_state == States.START:
-                    yield self.give_lex(States.NUMBER_HEX)
-
-            elif self.state == States.LETTER_B:
-                if new_state == States.NUMBER_BIN_END:
-                    yield self.give_lex(States.NUMBER_BIN)
-
-            elif self.state == States.LETTER_D:
-                if new_state == States.NUMBER_DEC_END:
-                    yield self.give_lex(States.NUMBER_DEC)
-
-            elif self.state == States.LETTER_E:
-                if new_state == States.NUMBER_ORDER_END:
-                    yield self.give_lex(States.FRACTIONAL)
-
-            elif self.state == States.LETTER_H:
-                if new_state == States.NUMBER_HEX_END:
-                    yield self.give_lex(States.NUMBER_HEX)
-
-            elif self.state == States.LETTER_O:
-                if new_state == States.NUMBER_OCT_END:
-                    yield self.give_lex(States.NUMBER_OCT)
-
-            elif self.state == States.FRACTIONAL:
-                if new_state == States.START:
-                    yield self.give_lex(States.FRACTIONAL)
-
-            elif self.state == States.NUMBER_ORDER:
-                if new_state == States.START:
-                    yield self.give_lex(States.FRACTIONAL)
-
-            elif self.state == States.ER:
-                if new_state == States.START:
-                    yield self.give_lex(States.ER)
-
-
-            if new_state == States.START or new_state.value < 0:
+            if new_state == States.START:
                 # Если следующее состояние стартовое, или соответствует завершению определённой лексемы,
-                if -5 <= self.state.value <= 0:
-                    self.state = States.DELIM
-                else:
-                    self.state = States.START
 
                 self.symbol += len(self.buffer)
                 self.buffer = ""
-            else:
-                # Если состояние промежуточное (лексема полностью не распознана)
-                self.state = new_state
+
+            self.state = new_state
 
             if char in BASE_SEPARATORS:
                 if char == "\n":
