@@ -73,6 +73,20 @@ def state_start_handler():
                 yield States.START
             elif char == "!":
                 yield States.SEPARATOR_NOT
+            elif char == "=":
+                yield States.SEPARATOR_EQUALS
+            elif char == "<":
+                yield States.SEPARATOR_LT
+            elif char == ">":
+                yield States.SEPARATOR_GT
+            elif char == "|":
+                yield States.SEPARATOR_OR
+            elif char == "&":
+                yield States.SEPARATOR_AND
+            elif char == ":":
+                yield States.SEPARATOR_ASSIGNMENT
+            elif char == "/":
+                yield States.SEPARATOR_COMMENT
             else:
                 yield States.ER
         else:
@@ -89,47 +103,139 @@ def state_identificator_handler():
         else:
             yield States.ER
 
-def state_delim_handler():
-    """
-    Разделители
-    в первый такт мы уже знаем, что следующий разделитель разделитель, и устанавливаем, что это за разделитель
-    во второй такт, мы отдаём его
-    """
-    state = States.START
+def state_separator_equals_handler():
+    # equals '=='
+    state = 0
     while True:
         char: str = yield
-        if state == States.START:
-            if char == "(":
-                state = States.SEPARATOR_LEFT_BRACKET, States.START
-            elif char == ")":
-                state = States.SEPARATOR_RIGHT_BRACKET, States.START
-            elif char == "+":
-                state = States.SEPARATOR_PLUS, States.START
-            elif char == "-":
-                state = States.SEPARATOR_MINUS, States.START
-            elif char == "*":
-                state = States.SEPARATOR_MULTIPLICATION, States.START
-            elif char == "/":
-                state = States.SEPARATOR_DIVISION, States.START
-            elif char == "{":
-                state = States.SEPARATOR_LEFT_FIGURE_BRACKET, States.START
-            elif char == "}":
-                state = States.SEPARATOR_RIGHT_FIGURE_BRACKET, States.START
-            elif char == ";":
-                state = States.SEPARATOR_SEMICOLON, States.START
-            yield States.DELIM
+
+        if state == 0:
+            if char == "=":
+                state = 1
+                yield States.SEPARATOR_EQUALS
+            else:
+                yield States.ER
         else:
-            yield state
+            yield States.SEPARATOR_EQUALS, States.START
+
+def state_separator_lt_handler():
+    state = 0
+    """
+    state = 0: - получаем символ '=' или отдаём лексему SEPARATOR_LT
+    state = 1 - отдаём лексему SEPARATPR_LTE
+    """
+    while True:
+        char: str = yield
+
+        if state == 0:
+            if char == "=":
+                state = 1
+                yield States.SEPARATOR_LT
+            else:
+                yield States.SEPARATOR_LT, States.START
+        else:
+            yield States.SEPARATOR_LTE, States.START
+
+def state_separatpr_gt_handler():
+    state = 0
+    while True:
+        char: str = yield
+
+        if state == 0:
+            if char == "=":
+                state = 1
+                yield States.SEPARATOR_GT
+            else:
+                yield States.SEPARATOR_GT, States.START
+        else:
+            yield States.SEPARATOR_GTE, States.START
+
+def state_separator_or_handler():
+    state = 0
+    while True:
+        char: str = yield
+
+        if state == 0:
+            if char == "|":
+                state = 1
+                yield States.SEPARATOR_OR
+            else:
+                yield States.ER
+        else:
+            yield States.SEPARATOR_OR, States.START
+
+def state_separator_and_handler():
+    state = 0
+    while True:
+        char: str = yield
+
+        if state == 0:
+            if char == "&":
+                state = 1
+                yield States.SEPARATOR_AND
+            else:
+                yield States.ER
+        else:
+            yield States.SEPARATOR_AND, States.START
+
+def state_separator_assignment_handler():
+    state = 0
+    while True:
+        char: str = yield
+
+        if state == 0:
+            if char == "=":
+                state = 1
+                yield States.SEPARATOR_ASSIGNMENT
+            else:
+                yield States.ER
+        else:
+            yield States.SEPARATOR_ASSIGNMENT, States.START
+
+def state_separator_comment_handler():
+    state = 0
+    while True:
+        char: str = yield
+
+        if state == 0:
+            if char == "*":
+                state = 1
+                yield States.SEPARATOR_COMMENT
+            else:
+                yield States.ER
+        else:
+            if char == "*":
+                yield States.SEPARATOR_COMMENT
+            else:
+                yield States.SEPARATOR_COMMENT
+
+
+def state_separator_comment_end_handler():
+    state = 0
+    while True:
+        char: str = yield
+
+        if state == 0:
+            if char == "/":
+                state = 1
+                yield States.SEPARATOR_COMMENT_END
+            else:
+                yield States.ER
+        else:
+            yield States.SEPARATOR_COMMENT_END, States.START
+
+
+
 
 def state_separator_not_handler():
     state = 0
     """
-    state = 0 - получаем символ ! (нам перенаправил его START)
-    state = 1 - либо = (!=), либо другой символ (!)
-    state = 2 - точно другой символ, отправляем (!=)
+    state = 0: - получаем символ '=' или отдаём лексему SEPARATOR_NOT
+    state = 1 - отдаём лексему SEPARATOR_NOT_EQUALS
     """
     while True:
         char: str = yield
+
         if state == 0:
             if char == "=":
                 state = 1
@@ -394,8 +500,13 @@ HANDLERS = {
     States.LETTER_E: state_letter_e_hander,
     States.LETTER_H: state_letter_h_handler,
     States.LETTER_O: state_letter_o_handler,
-    States.DELIM: state_delim_handler,
     States.SEPARATOR_NOT: state_separator_not_handler,
+    States.SEPARATOR_EQUALS: state_separator_equals_handler,
+    States.SEPARATOR_LT: state_separator_lt_handler,
+    States.SEPARATOR_GT: state_separatpr_gt_handler,
+    States.SEPARATOR_OR: state_separator_or_handler,
+    States.SEPARATOR_AND: state_separator_and_handler,
+    States.SEPARATOR_ASSIGNMENT: state_separator_assignment_handler,
     States.ER: state_er_handler,
 }
 

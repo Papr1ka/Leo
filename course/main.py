@@ -12,9 +12,22 @@ IDENT)
 IDENT{0}
 (
 """
-    NUMBERTEST = """(0110b)+-
+    NUMBERTEST = """a<b<<
+(0110b)+-
 (a!b)
 (a!=b)
+b==a
+b<=a
+b<a
+b>=a
+b>a
+>>>=>
+a||b
+|||a
+a&&b
+&&&b
+a:=b
+:=:b
 """
     # lexer = Lexer(source)
     # for i in lexer.getLex():
@@ -26,15 +39,14 @@ IDENT{0}
         file_contents = "\n".join(file.readlines())
 
     lexer = Lexer(NUMBERTEST)
-    pattern = "{:<24} {:<20} {:<8} {:<8}"
+    pattern = "{:<35} {:<20} {:<8} {:<8}"
 
     print(pattern.format("Lex type", "Lex", "Line", "Symbol"))
     print("{:-<75}".format(""))
     guard = 0
     for i in lexer.get_lex():
-        # print(pattern.format(*i))
+        print(pattern.format(*i))
         # print(next(lexer.get_lex()))
-        print(i)
         guard += 1
         if guard >= 100:
             print("Error: Force stoped by guard")

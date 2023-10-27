@@ -34,6 +34,9 @@ class States(Enum):
     SEPARATOR_LEFT_FIGURE_BRACKET = 29
     SEPARATOR_RIGHT_FIGURE_BRACKET = 30
     SEPARATOR_SEMICOLON = 31
+    SEPARATOR_LT = 33
+    SEPARATOR_GT = 34
+    SEPARATOR_COMMENT = 35
     DELIM = 50
 
     #Состояния завершения разбора лексемы
