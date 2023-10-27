@@ -210,6 +210,31 @@ class TestLexer(TestCase):
         self.assertEqual(next(g)[0:2], (States.SEPARATOR_GT, '>'))
         self.assertEqual(next(g)[0:2], (States.SEPARATOR_GT, '>'))
 
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_PLUS, '+'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_PLUS, '+'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_PLUS, '+'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_MINUS, '-'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_PLUS, '+'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_MINUS, '-'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_RIGHT_BRACKET, ')'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_PLUS, '+'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LEFT_BRACKET, '('))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LEFT_BRACKET, '('))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_PLUS, '+'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_RIGHT_BRACKET, ')'))
+
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_MINUS, '-'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_MINUS, '-'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_MINUS, '-'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_PLUS, '+'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_MINUS, '-'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_PLUS, '+'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_RIGHT_BRACKET, ')'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_MINUS, '-'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LEFT_BRACKET, '('))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_LEFT_BRACKET, '('))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_MINUS, '-'))
+        self.assertEqual(next(g)[0:2], (States.SEPARATOR_RIGHT_BRACKET, ')'))
 
 
 
