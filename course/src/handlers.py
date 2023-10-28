@@ -1,5 +1,5 @@
 from typing import TypeVar
-from src.states import States, SEPARATORS, BASE_SEPARATORS
+from src.constants import States, SEPARATORS, BASE_SEPARATORS, Lex
 
 state_handler = TypeVar("state_handler")
 
@@ -51,23 +51,25 @@ def state_start_handler():
                 yield States.FRACTIONAL
             elif char in BASE_SEPARATORS:
                 yield States.START
-            elif char in ("(", ")", "+", "-", "*", "{", "}", ";"):
+            elif char in ("(", ")", "+", "-", "*", "{", "}", ";", ","):
                 if char == "(":
-                    state = States.SEPARATOR_LEFT_BRACKET, States.START
+                    state = Lex.SEPARATOR_LEFT_BRACKET, States.START
                 elif char == ")":
-                    state = States.SEPARATOR_RIGHT_BRACKET, States.START
+                    state = Lex.SEPARATOR_RIGHT_BRACKET, States.START
                 elif char == "+":
-                    state = States.SEPARATOR_PLUS, States.START
+                    state = Lex.SEPARATOR_PLUS, States.START
                 elif char == "-":
-                    state = States.SEPARATOR_MINUS, States.START
+                    state = Lex.SEPARATOR_MINUS, States.START
                 elif char == "*":
-                    state = States.SEPARATOR_MULTIPLICATION, States.START
+                    state = Lex.SEPARATOR_MULTIPLICATION, States.START
                 elif char == "{":
-                    state = States.SEPARATOR_LEFT_FIGURE_BRACKET, States.START
+                    state = Lex.SEPARATOR_LEFT_FIGURE_BRACKET, States.START
                 elif char == "}":
-                    state = States.SEPARATOR_RIGHT_FIGURE_BRACKET, States.START
+                    state = Lex.SEPARATOR_RIGHT_FIGURE_BRACKET, States.START
                 elif char == ";":
-                    state = States.SEPARATOR_SEMICOLON, States.START
+                    state = Lex.SEPARATOR_SEMICOLON, States.START
+                elif char == ",":
+                    state = Lex.SEPARATOR_COMMA, States.START
                 yield States.START
             elif char == "!":
                 yield States.SEPARATOR_NOT
@@ -86,7 +88,7 @@ def state_start_handler():
             elif char == "/":
                 yield States.SEPARATOR_COMMENT
             else:
-                yield States.ER
+                yield ["Не распознано начало лексемы", States.ER]
         else:
             yield state
 
@@ -97,9 +99,9 @@ def state_identificator_handler():
         if char.isalpha() or char.isdigit():
             yield States.IDENTIFIER
         elif char in SEPARATORS:
-            yield States.IDENTIFIER, States.START
+            yield Lex.IDENTIFIER, States.START
         else:
-            yield States.ER
+            yield ["Идентификатор может состоять только из цифр и букв в любом регистре", States.ER]
 
 def state_separator_equals_handler():
     # equals '=='
@@ -112,9 +114,9 @@ def state_separator_equals_handler():
                 state = 1
                 yield States.SEPARATOR_EQUALS
             else:
-                yield States.ER
+                yield ["Лексема не распознана, возможно вы имели ввиду '==' ?", States.ER]
         else:
-            yield States.SEPARATOR_EQUALS, States.START
+            yield Lex.SEPARATOR_EQUALS, States.START
 
 def state_separator_lt_handler():
     state = 0
@@ -130,9 +132,9 @@ def state_separator_lt_handler():
                 state = 1
                 yield States.SEPARATOR_LT
             else:
-                yield States.SEPARATOR_LT, States.START
+                yield Lex.SEPARATOR_LT, States.START
         else:
-            yield States.SEPARATOR_LTE, States.START
+            yield Lex.SEPARATOR_LTE, States.START
 
 def state_separatpr_gt_handler():
     state = 0
@@ -144,9 +146,9 @@ def state_separatpr_gt_handler():
                 state = 1
                 yield States.SEPARATOR_GT
             else:
-                yield States.SEPARATOR_GT, States.START
+                yield Lex.SEPARATOR_GT, States.START
         else:
-            yield States.SEPARATOR_GTE, States.START
+            yield Lex.SEPARATOR_GTE, States.START
 
 def state_separator_or_handler():
     state = 0
@@ -158,9 +160,9 @@ def state_separator_or_handler():
                 state = 1
                 yield States.SEPARATOR_OR
             else:
-                yield States.ER
+                yield ["Лексема не распознана, возможно вы имели ввиду '||' ?", States.ER]
         else:
-            yield States.SEPARATOR_OR, States.START
+            yield Lex.SEPARATOR_OR, States.START
 
 def state_separator_and_handler():
     state = 0
@@ -172,9 +174,9 @@ def state_separator_and_handler():
                 state = 1
                 yield States.SEPARATOR_AND
             else:
-                yield States.ER
+                yield ["Лексема не распознана, возможно вы имели ввиду '&&' ?", States.ER]
         else:
-            yield States.SEPARATOR_AND, States.START
+            yield Lex.SEPARATOR_AND, States.START
 
 def state_separator_assignment_handler():
     state = 0
@@ -186,9 +188,9 @@ def state_separator_assignment_handler():
                 state = 1
                 yield States.SEPARATOR_ASSIGNMENT
             else:
-                yield States.ER
+                yield ["Лексема не распознана, возможно вы имели ввиду ':=' ?", States.ER]
         else:
-            yield States.SEPARATOR_ASSIGNMENT, States.START
+            yield Lex.SEPARATOR_ASSIGNMENT, States.START
 
 def state_separator_comment_handler():
     state = 0
@@ -205,7 +207,7 @@ def state_separator_comment_handler():
                 state = 1
                 yield States.SEPARATOR_COMMENT
             else:
-                yield States.SEPARATOR_DIVISION, States.START
+                yield Lex.SEPARATOR_DIVISION, States.START
         elif state == 1:
             if char == "*":
                 state = 2
@@ -219,24 +221,7 @@ def state_separator_comment_handler():
                 state = 1
             yield States.SEPARATOR_COMMENT
         else:
-            yield States.STATE_NULL, States.START
-
-
-def state_separator_comment_end_handler():
-    state = 0
-    while True:
-        char: str = yield
-
-        if state == 0:
-            if char == "/":
-                state = 1
-                yield States.SEPARATOR_COMMENT_END
-            else:
-                yield States.ER
-        else:
-            yield States.SEPARATOR_COMMENT_END, States.START
-
-
+            yield States.STATE_NULL
 
 
 def state_separator_not_handler():
@@ -253,9 +238,9 @@ def state_separator_not_handler():
                 state = 1
                 yield States.SEPARATOR_NOT
             else:
-                yield States.SEPARATOR_NOT, States.START
+                yield Lex.SEPARATOR_NOT, States.START
         else:
-            yield States.SEPARATOR_NOT_EQUALS, States.START
+            yield Lex.SEPARATOR_NOT_EQUALS, States.START
 
 
 
@@ -280,39 +265,39 @@ def state_number_bin_handler():
         elif char in ("d", "D"):
             yield States.LETTER_D
         elif char in SEPARATORS:
-            yield States.NUMBER_DEC, States.START
+            yield Lex.NUMBER_DEC, States.START
         elif char in ("a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"):
             yield States.NUMBER_HEX
         elif char in ("h", "H"):
             yield States.LETTER_H
         else:
-            yield States.ER
+            yield ["Число не может быть построено, некорректный символ в числе", States.ER]
 
 def state_letter_b_handler():
     while True:
         char: str = yield
 
         if char in SEPARATORS:
-            yield States.NUMBER_BIN, States.START
+            yield Lex.NUMBER_BIN, States.START
         elif char.isdigit() or char in ("a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"):
             yield States.NUMBER_HEX
         elif char in ("h", "H"):
             yield States.LETTER_H
         else:
-            yield States.ER
+            yield ["После двоичного числа необходим разделитель", States.ER]
 
 def state_letter_d_hander():
     while True:
         char: str = yield
 
         if char in SEPARATORS:
-            yield States.NUMBER_DEC, States.START
+            yield Lex.NUMBER_DEC, States.START
         elif char.isdigit() or char in ("a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"):
             yield States.NUMBER_HEX
         elif char in ("h", "H"):
             yield States.LETTER_H
         else:
-            yield States.ER
+            yield ["После десятичного числа необходим разделитель", States.ER]
 
 def state_letter_e_hander():
     #10E0H
@@ -342,7 +327,7 @@ def state_letter_e_hander():
                 yield States.LETTER_E
                 state = 1
             else:
-                yield States.ER
+                yield ["Шестнадцатиричное число или порядок дробного записаны некорректно", States.ER]
         elif state == 1:
             if char.isdigit():
                 yield States.LETTER_E
@@ -351,32 +336,32 @@ def state_letter_e_hander():
             elif char in ("a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"):
                 yield States.NUMBER_HEX
             elif char in SEPARATORS:
-                # check this
-                yield States.FRACTIONAL, States.START
+                yield Lex.NUMBER_FRACTIONAL, States.START
             else:
-                yield States.ER
+                yield ["Шестнадцатиричное число или порядок дробного записаны некорректно", States.ER]
         elif state == 2:
             if char.isdigit():
                 yield States.LETTER_E
             elif char in SEPARATORS:
-                # and this
-                yield States.FRACTIONAL, States.START
+                yield Lex.NUMBER_FRACTIONAL, States.START
+            else:
+                yield ["Порядок дробного числа записан некорректно", States.ER]
 
 def state_letter_h_handler():
     while True:
         char: str = yield
         if char in SEPARATORS:
-            yield States.NUMBER_HEX, States.START
+            yield Lex.NUMBER_HEX, States.START
         else:
-            yield States.ER
+            yield ["После шестнадцатиричного числа необходим разделитель", States.ER]
 
 def state_letter_o_handler():
     while True:
         char: str = yield
         if char in SEPARATORS:
-            yield States.NUMBER_OCT, States.START
+            yield Lex.NUMBER_OCT, States.START
         else:
-            yield States.ER
+            yield ["После восьмиричного числа необходим разделитель", States.ER]
 
 def state_number_oct_handler():
     while True:
@@ -395,13 +380,13 @@ def state_number_oct_handler():
         elif char in ("d", "D"):
             yield States.LETTER_D
         elif char in SEPARATORS:
-            yield States.NUMBER_DEC, States.START
+            yield Lex.NUMBER_DEC, States.START
         elif char in ("h", "H"):
             yield States.LETTER_H
         elif char in ("a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"):
             yield States.NUMBER_HEX
         else:
-            yield States.ER
+            yield ["Число не может быть построено, некорректный символ в числе", States.ER]
 def state_number_dec_handler():
     while True:
         char: str = yield
@@ -419,9 +404,9 @@ def state_number_dec_handler():
         elif char in ("a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"):
             yield States.NUMBER_HEX
         elif char in SEPARATORS:
-            yield States.NUMBER_DEC, States.START
+            yield Lex.NUMBER_DEC, States.START
         else:
-            yield States.ER
+            yield ["Число не может быть построено, некорректный символ в числе", States.ER]
 
 def state_number_hex_handler():
     while True:
@@ -432,7 +417,7 @@ def state_number_hex_handler():
         elif char in ("h", "H"):
             yield States.LETTER_H
         else:
-            yield States.ER
+            yield ["Число не может быть построено, один из символов выходит за рамки числа", States.ER]
 
 def state_fractional_handler():
     state = 0
@@ -448,16 +433,16 @@ def state_fractional_handler():
                 yield States.FRACTIONAL
                 state = 1
             else:
-                yield States.ER
+                yield ["Дробное число: после символа '.' необходима цифра", States.ER]
         elif state == 1:
             if char.isdigit():
                 yield States.FRACTIONAL
             elif char in ("e", "E"):
                 yield States.NUMBER_ORDER
             elif char in SEPARATORS:
-                yield States.FRACTIONAL, States.START
+                yield Lex.NUMBER_FRACTIONAL, States.START
             else:
-                yield States.ER
+                yield ["Дробное число: после числа необходим порядок или разделитель", States.ER]
 
 def state_number_order_handler():
     state = 0
@@ -471,28 +456,27 @@ def state_number_order_handler():
                 yield States.NUMBER_ORDER
                 state = 2
             else:
-                yield States.ER
+                yield ["Порядок записан некорректно", States.ER]
         elif state == 1:
             if char.isdigit():
                 yield States.NUMBER_ORDER
                 state = 2
             else:
-                yield States.ER
+                yield ["Порядок записан некорректно", States.ER]
         elif state == 2:
             if char.isdigit():
                 yield States.NUMBER_ORDER
             elif char in SEPARATORS:
-                # check this
-                yield States.FRACTIONAL, States.START
+                yield Lex.NUMBER_FRACTIONAL, States.START
             else:
-                yield States.ER
+                yield ["Порядок записан некорректно", States.ER]
 
 
 def state_er_handler():
     while True:
         char: str = yield
         if char in SEPARATORS:
-            yield States.ER, States.START
+            yield Lex.UNRESOLVED, States.START
         else:
             yield States.ER
 

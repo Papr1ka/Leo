@@ -49,22 +49,25 @@ a:=b
 *
 * /
 5
-*/
+* /
 """
 
     file_contents = ""
 
-    with open("./src/tests/test_separators.txt") as file:
+    with open("./examples/ex1") as file:
         file_contents = "\n".join(file.readlines())
 
-    lexer = Lexer(NUMBERTEST)
-    pattern = "{:<35} {:<20} {:<8} {:<8}"
+    lexer = Lexer(file_contents)
+    pattern = "{:<35} {:<20} {:<8} {:<8} {:<40}"
 
-    print(pattern.format("Lex type", "Lex", "Line", "Symbol"))
+    print(pattern.format("Lex type", "Lex", "Line", "Symbol", "Error message"))
     print("{:-<75}".format(""))
     guard = 0
     for i in lexer.get_lex():
-        print(pattern.format(*i))
+        if len(i) == 4:
+            print(pattern.format(*i, ""))
+        else:
+            print(pattern.format(*i))
         # print(next(lexer.get_lex()))
         guard += 1
         if guard >= 300:
