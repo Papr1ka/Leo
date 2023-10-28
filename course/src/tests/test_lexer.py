@@ -371,9 +371,100 @@ class TestLexer(TestCase):
         lexer = Lexer(data).get_lex()
         g = iter(lexer)
         self.assertEqual(next(g)[2:4], (1, 1))
+
         self.assertEqual(next(g)[2:4], (2, 5))
         self.assertEqual(next(g)[2:4], (2, 9))
         self.assertEqual(next(g)[2:4], (2, 25))
+        self.assertEqual(next(g)[2:4], (2, 27))
+        self.assertEqual(next(g)[2:4], (2, 33))
+        self.assertEqual(next(g)[2:4], (2, 35))
+        self.assertEqual(next(g)[2:4], (2, 36))
+        self.assertEqual(next(g)[2:4], (2, 38))
+        self.assertEqual(next(g)[2:4], (2, 39))
+
+        self.assertEqual(next(g)[2:4], (4, 5))
+        self.assertEqual(next(g)[2:4], (4, 22))
+        self.assertEqual(next(g)[2:4], (4, 25))
+        self.assertEqual(next(g)[2:4], (4, 27))
+
+        self.assertEqual(next(g)[2:4], (5, 5))
+        self.assertEqual(next(g)[2:4], (5, 12))
+        self.assertEqual(next(g)[2:4], (5, 15))
+        self.assertEqual(next(g)[2:4], (5, 16))
+
+        self.assertEqual(next(g)[2:4], (7, 5))
+        self.assertEqual(next(g)[2:4], (7, 11))
+        self.assertEqual(next(g)[2:4], (7, 12))
+        self.assertEqual(next(g)[2:4], (7, 29))
+        self.assertEqual(next(g)[2:4], (7, 31))
+        self.assertEqual(next(g)[2:4], (7, 32))
+
+        self.assertEqual(next(g)[2:4], (8, 5))
+
+        self.assertEqual(next(g)[2:4], (9, 5))
+        self.assertEqual(next(g)[2:4], (9, 12))
+        self.assertEqual(next(g)[2:4], (9, 15))
+        self.assertEqual(next(g)[2:4], (9, 22))
+        self.assertEqual(next(g)[2:4], (9, 24))
+        self.assertEqual(next(g)[2:4], (9, 25))
+
+        self.assertEqual(next(g)[2:4], (10, 5))
+        self.assertEqual(next(g)[2:4], (10, 7))
+        self.assertEqual(next(g)[2:4], (10, 10))
+        self.assertEqual(next(g)[2:4], (10, 11))
+
+        self.assertEqual(next(g)[2:4], (12, 5))
+        self.assertEqual(next(g)[2:4], (12, 9))
+        self.assertEqual(next(g)[2:4], (12, 11))
+        self.assertEqual(next(g)[2:4], (12, 14))
+        self.assertEqual(next(g)[2:4], (12, 16))
+        self.assertEqual(next(g)[2:4], (12, 19))
+        self.assertEqual(next(g)[2:4], (12, 26))
+        self.assertEqual(next(g)[2:4], (12, 31))
+
+        self.assertEqual(next(g)[2:4], (13, 5))
+
+        self.assertEqual(next(g)[2:4], (15, 5))
+        self.assertEqual(next(g)[2:4], (15, 8))
+        self.assertEqual(next(g)[2:4], (15, 9))
+        self.assertEqual(next(g)[2:4], (15, 16))
+        self.assertEqual(next(g)[2:4], (15, 18))
+        self.assertEqual(next(g)[2:4], (15, 20))
+        self.assertEqual(next(g)[2:4], (15, 22))
+        self.assertEqual(next(g)[2:4], (15, 24))
+        self.assertEqual(next(g)[2:4], (15, 27))
+        self.assertEqual(next(g)[2:4], (15, 33))
+        self.assertEqual(next(g)[2:4], (15, 35))
+        self.assertEqual(next(g)[2:4], (15, 37))
+        self.assertEqual(next(g)[2:4], (15, 40))
+        self.assertEqual(next(g)[2:4], (15, 42))
+        self.assertEqual(next(g)[2:4], (15, 44))
+
+        self.assertEqual(next(g)[2:4], (17, 5))
+
+        self.assertEqual(next(g)[2:4], (18, 5))
+        self.assertEqual(next(g)[2:4], (18, 9))
+
+        self.assertEqual(next(g)[2:4], (20, 5))
+        self.assertEqual(next(g)[2:4], (20, 8))
+        self.assertEqual(next(g)[2:4], (20, 9))
+        self.assertEqual(next(g)[2:4], (20, 11))
+        self.assertEqual(next(g)[2:4], (20, 14))
+        self.assertEqual(next(g)[2:4], (20, 15))
+        self.assertEqual(next(g)[2:4], (20, 17))
+        self.assertEqual(next(g)[2:4], (20, 34))
+        self.assertEqual(next(g)[2:4], (20, 37))
+        self.assertEqual(next(g)[2:4], (20, 54))
+        self.assertEqual(next(g)[2:4], (20, 56))
+
+        self.assertEqual(next(g)[2:4], (22, 5))
+        self.assertEqual(next(g)[2:4], (22, 8))
+
+        self.assertEqual(next(g)[2:4], (35, 5))
+        self.assertEqual(next(g)[2:4], (35, 13))
+        self.assertEqual(next(g)[2:4], (35, 19))
+
+        self.assertEqual(next(g)[2:4], (36, 1))
 
     def test_lex_identifiers_separators(self):
         with open("./src/tests/test_separators_context.txt") as file:

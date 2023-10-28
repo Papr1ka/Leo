@@ -55,7 +55,7 @@ a:=b
     file_contents = ""
 
     with open("./examples/ex1") as file:
-        file_contents = "\n".join(file.readlines())
+        file_contents = "".join(file.readlines())
 
     lexer = Lexer(file_contents)
     pattern = "{:<35} {:<20} {:<8} {:<8} {:<40}"

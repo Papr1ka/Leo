@@ -134,7 +134,7 @@ class Lexer():
             elif lex is not None:
                 yield self.give_lex(lex)
 
-            if char not in BASE_SEPARATORS:
+            if char not in BASE_SEPARATORS and lex is None:
                 self.buffer += char
 
             if lex is not None:
