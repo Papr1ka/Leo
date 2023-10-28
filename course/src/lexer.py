@@ -121,30 +121,37 @@ class Lexer():
             # новое состояние, в которое нам следует перейти
             new_state = handler.send(char)
 
+            # если получили лексему и новое состояние
             if isinstance(new_state, tuple):
                 lex, new_state = new_state
 
+            # если получили сообщение об ошибке и состояние ошибки
             if isinstance(new_state, list):
                 self.error_message, new_state = new_state
 
+            # если закончился комментарий
             if new_state == States.STATE_NULL:
                 new_state = States.START
                 self.buffer = ""
 
+            # выдаём распознанную лексему
             elif lex is not None:
                 yield self.give_lex(lex)
 
+            # накопление буфера (в случае если lex не None накопление не нужно, так лексема уже была выдана во вне)
+            # если lex не None, в буфер попадёт `мусор`, который собьёт счётчик символа в строке (symbol)
             if char not in BASE_SEPARATORS and lex is None:
                 self.buffer += char
 
             if lex is not None:
-                # Если следующее состояние стартовое, или соответствует завершению определённой лексемы,
+                # если была распознана лексема
 
                 self.symbol += len(self.buffer)
                 self.buffer = ""
 
             self.state = new_state
 
+            # подсчёт номера линии и символа в строке
             if char in BASE_SEPARATORS:
                 if lex is None:
                     if char == "\n":
