@@ -8,3 +8,5 @@
 course/src/__pycache__/
 
 .idea/
+
+course/src/tests/__pycache__/

@@ -22,5 +22,4 @@ SEPARATOR_ASSIGNMENT - :=
 DELIM - (, ), +, -, *, /, {, }, ;
 ERR - ошибка
 COMMENT1 - /*
-COMMENT2 - * - любые символы
-COMMENT3 - */
+COMMENT2 - */
