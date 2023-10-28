@@ -21,12 +21,18 @@ if __name__ == '__main__':
     print(pattern.format("Lex type", "Lex", "Line", "Symbol", "Error message"))
     print("{:-<115}".format(""))
 
+    DEBUG = 1
+
     guard = 0
     for i in lexer.get_lex():
-        if len(i) == 4:
-            print(pattern.format(*i, ""))
+        if DEBUG:
+            if len(i) == 4:
+                print(pattern.format(*i, ""))
+            else:
+                print(pattern.format(*i))
         else:
-            print(pattern.format(*i))
+            print(i)
+
         guard += 1
         if guard >= 1000:
             print("Error: Force stoped by guard")
