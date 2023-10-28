@@ -122,3 +122,23 @@ class Lex(Enum):
     SEPARATOR_COMMA = 42
 
     UNRESOLVED = 0
+
+
+KEYWORDS = {
+    'begin': Lex.KEYWORD_BEGIN,
+    'bool': Lex.KEYWORD_BOOL,
+    'else': Lex.KEYWORD_ELSE,
+    'end': Lex.KEYWORD_END,
+    'false': Lex.KEYWORD_FALSE,
+    'float': Lex.KEYWORD_FLOAT,
+    'for': Lex.KEYWORD_FOR,
+    'if': Lex.KEYWORD_IF,
+    'int': Lex.KEYWORD_INT,
+    'next': Lex.KEYWORD_NEXT,
+    'readln': Lex.KEYWORD_READLN,
+    'step': Lex.KEYWORD_STEP,
+    'to': Lex.KEYWORD_TO,
+    'true': Lex.KEYWORD_TRUE,
+    'while': Lex.KEYWORD_WHILE,
+    'writeln': Lex.KEYWORD_WRITELN,
+}

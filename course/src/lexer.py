@@ -1,4 +1,4 @@
-from src.constants import States, BASE_SEPARATORS, Lex
+from src.constants import States, BASE_SEPARATORS, Lex, KEYWORDS
 from src.handlers import HandlerFactory
 
 """
@@ -136,7 +136,14 @@ class Lexer():
 
             # выдаём распознанную лексему
             elif lex is not None:
-                yield self.give_lex(lex)
+                if lex == Lex.IDENTIFIER:
+                    keyword = KEYWORDS.get(self.buffer)
+                    if keyword is None:
+                        yield self.give_lex(lex)
+                    else:
+                        yield self.give_lex(keyword)
+                else:
+                    yield self.give_lex(lex)
 
             # накопление буфера (в случае если lex не None накопление не нужно, так лексема уже была выдана во вне)
             # если lex не None, в буфер попадёт `мусор`, который собьёт счётчик символа в строке (symbol)
