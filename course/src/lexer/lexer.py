@@ -1,5 +1,5 @@
-from src.constants import States, BASE_SEPARATORS, Lex, KEYWORDS
-from src.handlers import HandlerFactory
+from src.constants import BASE_SEPARATORS, KEYWORDS, Lex, Lexeme, States
+from src.lexer.handlers import HandlerFactory
 
 """
 Приблизительная оценка:
@@ -96,8 +96,8 @@ class Lexer():
         """
         self.unget_char()
         if lex == Lex.UNRESOLVED:
-            return lex, self.buffer, self.line, self.symbol, self.error_message
-        return lex, self.buffer, self.line, self.symbol
+            return Lexeme(lex, self.buffer, self.line, self.symbol, self.error_message)
+        return Lexeme(lex, self.buffer, self.line, self.symbol, "")
 
     def get_lex(self):
         """

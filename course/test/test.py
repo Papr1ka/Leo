@@ -1,9 +1,6 @@
 # from src.states import States
 
-from enum import Enum
-from inspect import getgeneratorstate as ggs
-from inspect import getgeneratorlocals as ggl
-from src.handlers import HandlerFactory, States
+from src.lexer.handlers import HandlerFactory, States
 
 
 # class States(Enum):

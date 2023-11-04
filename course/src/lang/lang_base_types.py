@@ -72,7 +72,7 @@ class Integer(Number):
 
     def __init__(self, value: int):
         if not isinstance(value, int):
-            raise ValueError("Value must be int type")
+            raise ValueError("Значение параметра value должно быть типа int")
         self.value = value
 
     def add(self, other):
@@ -95,7 +95,7 @@ class Float(Number):
 
     def __init__(self, value: float):
         if not isinstance(value, float):
-            raise ValueError("Value must be float type")
+            raise ValueError("Значение параметра value должно быть типа float")
         self.value = value
 
     def add(self, other):
@@ -120,5 +120,5 @@ class Boolean(BaseType):
 
     def __init__(self, value: bool):
         if not isinstance(value, bool):
-            raise ValueError("Value must be bool type")
+            raise ValueError("Значение параметра value должно быть типа bool")
         self.value = value

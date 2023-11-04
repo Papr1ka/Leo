@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import Enum
 
 
@@ -142,3 +143,17 @@ KEYWORDS = {
     'while': Lex.KEYWORD_WHILE,
     'writeln': Lex.KEYWORD_WRITELN,
 }
+
+
+@dataclass
+class Lexeme:
+    lex: Lex
+    value: str
+    line: int
+    symbol: int
+    error: str
+
+
+class LangSyntaxException(Exception):
+    def __init__(self, message, line, symbol):
+        super().__init__(f"Строка {line}, Символ {symbol}\nСинтаксическая ошибка: {message}")

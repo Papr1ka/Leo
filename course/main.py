@@ -26,10 +26,7 @@ if __name__ == '__main__':
     guard = 0
     for i in lexer.get_lex():
         if DEBUG:
-            if len(i) == 4:
-                print(pattern.format(*i, ""))
-            else:
-                print(pattern.format(*i))
+            print(pattern.format(i.lex, i.value, i.line, i.symbol, i.error, ""))
         else:
             print(i)
 

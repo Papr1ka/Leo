@@ -1,6 +1,6 @@
 import unittest
 
-from lang_base_types import Boolean, Float, Integer
+from src.lang.lang_base_types import Boolean, Float, Integer
 
 
 class TypesTest(unittest.TestCase):
