@@ -1,5 +1,6 @@
 from typing import TypeVar
-from src.constants import States, SEPARATORS, BASE_SEPARATORS, Lex
+
+from src.constants import BASE_SEPARATORS, Lex, SEPARATORS, States
 
 state_handler = TypeVar("state_handler")
 
@@ -28,6 +29,7 @@ state_{состояние}_handler
     
     Отдельно см. класс HandlerFactory
 """
+
 
 def state_start_handler():
     """
@@ -92,6 +94,7 @@ def state_start_handler():
         else:
             yield state
 
+
 def state_identificator_handler():
     while True:
         char: str = yield
@@ -102,6 +105,7 @@ def state_identificator_handler():
             yield Lex.IDENTIFIER, States.START
         else:
             yield ["Идентификатор может состоять только из цифр и букв в любом регистре", States.ER]
+
 
 def state_separator_equals_handler():
     # equals '=='
@@ -117,6 +121,7 @@ def state_separator_equals_handler():
                 yield ["Лексема не распознана, возможно вы имели ввиду '==' ?", States.ER]
         else:
             yield Lex.SEPARATOR_EQUALS, States.START
+
 
 def state_separator_lt_handler():
     state = 0
@@ -136,6 +141,7 @@ def state_separator_lt_handler():
         else:
             yield Lex.SEPARATOR_LTE, States.START
 
+
 def state_separatpr_gt_handler():
     state = 0
     while True:
@@ -149,6 +155,7 @@ def state_separatpr_gt_handler():
                 yield Lex.SEPARATOR_GT, States.START
         else:
             yield Lex.SEPARATOR_GTE, States.START
+
 
 def state_separator_or_handler():
     state = 0
@@ -164,6 +171,7 @@ def state_separator_or_handler():
         else:
             yield Lex.SEPARATOR_OR, States.START
 
+
 def state_separator_and_handler():
     state = 0
     while True:
@@ -178,6 +186,7 @@ def state_separator_and_handler():
         else:
             yield Lex.SEPARATOR_AND, States.START
 
+
 def state_separator_assignment_handler():
     state = 0
     while True:
@@ -191,6 +200,7 @@ def state_separator_assignment_handler():
                 yield ["Лексема не распознана, возможно вы имели ввиду ':=' ?", States.ER]
         else:
             yield Lex.SEPARATOR_ASSIGNMENT, States.START
+
 
 def state_separator_comment_handler():
     state = 0
@@ -243,7 +253,6 @@ def state_separator_not_handler():
             yield Lex.SEPARATOR_NOT_EQUALS, States.START
 
 
-
 def state_number_bin_handler():
     while True:
         char: str = yield
@@ -273,6 +282,7 @@ def state_number_bin_handler():
         else:
             yield ["Число не может быть построено, некорректный символ в числе", States.ER]
 
+
 def state_letter_b_handler():
     while True:
         char: str = yield
@@ -285,6 +295,7 @@ def state_letter_b_handler():
             yield States.LETTER_H
         else:
             yield ["После двоичного числа необходим разделитель", States.ER]
+
 
 def state_letter_d_hander():
     while True:
@@ -299,11 +310,12 @@ def state_letter_d_hander():
         else:
             yield ["После десятичного числа необходим разделитель", States.ER]
 
+
 def state_letter_e_hander():
-    #10E0H
-    #10E10
-    #10E+10
-    #10EH
+    # 10E0H
+    # 10E10
+    # 10E+10
+    # 10EH
     """
     state = 0 - не можем определить, что будет в итоге
     state = 1 - формируется либо 16-ричное число, либо порядок числа
@@ -347,6 +359,7 @@ def state_letter_e_hander():
             else:
                 yield ["Порядок дробного числа записан некорректно", States.ER]
 
+
 def state_letter_h_handler():
     while True:
         char: str = yield
@@ -355,6 +368,7 @@ def state_letter_h_handler():
         else:
             yield ["После шестнадцатиричного числа необходим разделитель", States.ER]
 
+
 def state_letter_o_handler():
     while True:
         char: str = yield
@@ -362,6 +376,7 @@ def state_letter_o_handler():
             yield Lex.NUMBER_OCT, States.START
         else:
             yield ["После восьмиричного числа необходим разделитель", States.ER]
+
 
 def state_number_oct_handler():
     while True:
@@ -387,6 +402,8 @@ def state_number_oct_handler():
             yield States.NUMBER_HEX
         else:
             yield ["Число не может быть построено, некорректный символ в числе", States.ER]
+
+
 def state_number_dec_handler():
     while True:
         char: str = yield
@@ -408,6 +425,7 @@ def state_number_dec_handler():
         else:
             yield ["Число не может быть построено, некорректный символ в числе", States.ER]
 
+
 def state_number_hex_handler():
     while True:
         char: str = yield
@@ -418,6 +436,7 @@ def state_number_hex_handler():
             yield States.LETTER_H
         else:
             yield ["Число не может быть построено, один из символов выходит за рамки числа", States.ER]
+
 
 def state_fractional_handler():
     state = 0
@@ -443,6 +462,7 @@ def state_fractional_handler():
                 yield Lex.NUMBER_FRACTIONAL, States.START
             else:
                 yield ["Дробное число: после числа необходим порядок или разделитель", States.ER]
+
 
 def state_number_order_handler():
     state = 0
@@ -479,7 +499,6 @@ def state_er_handler():
             yield Lex.UNRESOLVED, States.START
         else:
             yield States.ER
-
 
 
 HANDLERS = {
@@ -550,6 +569,7 @@ class HandlerFactory:
         следит за тем, когда подгенератор activated_generator возвращает состояния, соответствующие концу работы генератора
         и кладёт в кэш новый инициализированный объект генератор, чтобы сбросить внутренние состояния для следующих лексем
         """
+
         def wrapper(*args, **kwargs):
             new_state = None
             while True:

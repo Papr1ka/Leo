@@ -1,5 +1,5 @@
-from src.constants import States, BASE_SEPARATORS, Lex
-from src.handlers import HandlerFactory
+from src.constants import BASE_SEPARATORS, KEYWORDS, Lex, Lexeme, States
+from src.lexer.handlers import HandlerFactory
 
 """
 Приблизительная оценка:
@@ -96,8 +96,8 @@ class Lexer():
         """
         self.unget_char()
         if lex == Lex.UNRESOLVED:
-            return lex, self.buffer, self.line, self.symbol, self.error_message
-        return lex, self.buffer, self.line, self.symbol
+            return Lexeme(lex, self.buffer, self.line, self.symbol, self.error_message)
+        return Lexeme(lex, self.buffer, self.line, self.symbol, "")
 
     def get_lex(self):
         """
@@ -121,30 +121,44 @@ class Lexer():
             # новое состояние, в которое нам следует перейти
             new_state = handler.send(char)
 
+            # если получили лексему и новое состояние
             if isinstance(new_state, tuple):
                 lex, new_state = new_state
 
+            # если получили сообщение об ошибке и состояние ошибки
             if isinstance(new_state, list):
                 self.error_message, new_state = new_state
 
+            # если закончился комментарий
             if new_state == States.STATE_NULL:
                 new_state = States.START
                 self.buffer = ""
 
+            # выдаём распознанную лексему
             elif lex is not None:
-                yield self.give_lex(lex)
+                if lex == Lex.IDENTIFIER:
+                    keyword = KEYWORDS.get(self.buffer)
+                    if keyword is None:
+                        yield self.give_lex(lex)
+                    else:
+                        yield self.give_lex(keyword)
+                else:
+                    yield self.give_lex(lex)
 
+            # накопление буфера (в случае если lex не None накопление не нужно, так лексема уже была выдана во вне)
+            # если lex не None, в буфер попадёт `мусор`, который собьёт счётчик символа в строке (symbol)
             if char not in BASE_SEPARATORS and lex is None:
                 self.buffer += char
 
             if lex is not None:
-                # Если следующее состояние стартовое, или соответствует завершению определённой лексемы,
+                # если была распознана лексема
 
                 self.symbol += len(self.buffer)
                 self.buffer = ""
 
             self.state = new_state
 
+            # подсчёт номера линии и символа в строке
             if char in BASE_SEPARATORS:
                 if lex is None:
                     if char == "\n":
