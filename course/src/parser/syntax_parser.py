@@ -18,6 +18,7 @@ class SyntaxParser:
 
     def throw_error(self, message: str):
         raise LangSyntaxException(message, self.lexeme.line, self.lexeme.symbol)
+        exit(1)
 
     def new_lex(self):
         try:
