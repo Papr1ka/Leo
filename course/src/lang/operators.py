@@ -1,10 +1,20 @@
 from abc import ABC, abstractmethod
 
-from identifiers import add_identifier, get_identifier, Identifier
-from lang_base_types import BaseType
+from src.lang.identifiers import add_identifier, get_identifier, Identifier
+from src.lang.lang_base_types import BaseType
 
 
 class BaseOperator(ABC):
+    args = []
+    kwargs = {}
+
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+
+    def run(self):
+        self(*self.args, **self.kwargs)
+
     @abstractmethod
     def __call__(self, *args, **kwargs):
         pass
@@ -25,3 +35,4 @@ class AssignmentOperator(BaseOperator):
 
 class BranchOperator(BaseOperator):
     def __call__(self, expression: BaseType):
+        pass

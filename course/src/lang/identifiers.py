@@ -1,4 +1,4 @@
-from lang_base_types import BaseType
+from src.lang.lang_base_types import BaseType
 
 identifiers = {}
 

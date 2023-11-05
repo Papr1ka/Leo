@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Union
 
+from src.constants import Lex
+
 
 class BaseType(ABC):
     value: Union[int, float, bool]
@@ -122,3 +124,10 @@ class Boolean(BaseType):
         if not isinstance(value, bool):
             raise ValueError("Значение параметра value должно быть типа bool")
         self.value = value
+
+
+TYPES = {
+    Lex.KEYWORD_INT: Integer,
+    Lex.KEYWORD_FLOAT: Float,
+    Lex.KEYWORD_BOOL: Boolean
+}
