@@ -1,69 +1,537 @@
-from abc import ABC, abstractmethod
-from typing import List
+from pprint import pprint
+from typing import Any, List, Tuple
 
-from src.constants import Lex
-from syntax_parser import SyntaxParser
+from src.constants import Lexeme
+from src.lang import *
+
+analyzer = None
+
+
+def callback(callback_func=None):
+    if callback_func is None:
+        raise ValueError("Пустой callback")
+
+    def inner(method):
+        def wrapper(*args, **kwargs):
+            result = method(*args, **kwargs)
+            callback_func(method, result)
+            return result
+
+        return wrapper
+
+    return inner
+
+
+def simple_callback(method, lexemes):
+    if lexemes[0]:
+        print()
+        print(method)
+        pprint([i.value for i in lexemes])
+
+
+def init(instance):
+    global analyzer
+    analyzer = instance
 
 
 class BaseParser(ABC):
-    analyzer: SyntaxParser
-
-    def __init__(self, analyzer: SyntaxParser):
-        self.analyzer = analyzer
-
     @abstractmethod
-    def parse(self) -> bool:
+    def __call__(self, *args, **kwargs) -> Union[Tuple[bool, List[Lexeme], bool], Any]:
         pass
+
+    def __and__(self, other):
+        return Concat(self, other)
+
+    def __or__(self, other):
+        return Or(self, other)
+
+    def opt(self):
+        return Optional(self)
+
+    def many(self):
+        return Many(self)
+
+    def at_least_once(self):
+        return AtLeastOnce(self)
+
+
+class Concat(BaseParser):
+    def __init__(self, left_parser, right_parser):
+        self.left = left_parser
+        self.right = right_parser
+
+    def __call__(self):
+        left_success, left_result, already_get = self.left()
+        if left_success:
+            if not already_get:
+                analyzer.new_lex()
+            right_success, right_result, already_get = self.right()
+            if right_success:
+                if not already_get:
+                    analyzer.new_lex()
+                return True, [*left_result, *right_result], True
+        return False, [], True
+
+
+class Or(BaseParser):
+    def __init__(self, left_parser, right_parser):
+        self.left = left_parser
+        self.right = right_parser
+
+    def __call__(self):
+        left_success, left_result, already_get = self.left()
+        if left_success:
+            if not already_get:
+                analyzer.new_lex()
+            return True, left_result, True
+
+        right_success, right_result, already_get = self.right()
+        if right_success:
+            if not already_get:
+                analyzer.new_lex()
+            return True, right_result, True
+        return False, [], already_get
+
+
+class Optional(BaseParser):
+    def __init__(self, parser):
+        self.parser = parser
+
+    def __call__(self):
+        success, result, already_get = self.parser()
+        if success:
+            if not already_get:
+                analyzer.new_lex()
+            return True, result, True
+        return True, [], True
+
+
+class Many(BaseParser):
+    def __init__(self, parser):
+        self.parser = parser
+
+    def __call__(self):
+        results = []
+        while True:
+            success, result, already_get = self.parser()
+            if success:
+                if not already_get:
+                    analyzer.new_lex()
+                results.extend(result)
+            else:
+                break
+
+        return True, results, True
+
+
+class AtLeastOnce(BaseParser):
+    def __init__(self, parser):
+        self.parser = parser
+
+    def __call__(self):
+        results = []
+        first_success = False
+        while True:
+            success, result, already_get = self.parser()
+            if success:
+                first_success = True
+                results.extend(result)
+                if not already_get:
+                    analyzer.new_lex()
+            else:
+                if first_success:
+                    return True, result, True
+                else:
+                    return False, result, True
 
 
 class LexParser(BaseParser):
     lex: Lex
 
-    def __init__(self, analyzer: SyntaxParser, lex: Lex):
-        super().__init__(analyzer)
+    def __init__(self, lex: Lex):
         self.lex = lex
 
-    def parse(self) -> bool:
-        return self.analyzer.get_lex().lex == self.lex
+    def __call__(self):
+        lexeme = analyzer.get_lex()
+        if lexeme.lex == self.lex:
+            return True, [lexeme], False
+        return False, [], False
 
 
-class ChoiceParser(BaseParser):
-    parsers: List[BaseParser]
+class CombineParser(BaseParser):
+    def __init__(self):
+        super().__init__()
 
-    def __init__(self, analyzer: SyntaxParser, parsers: List[BaseParser]):
-        super().__init__(analyzer)
-        self.parsers = parsers
-
-    def parse(self) -> bool:
-        for parser in self.parsers:
-            if parser.parse():
-                return True
-        return False
-
-
-class ManyParser(BaseParser):
-    parser: BaseParser
-
-    def __init__(self, analyzer: SyntaxParser, parser: BaseParser):
-        super().__init__(analyzer)
-        self.parser = parser
-
-    def parse(self) -> bool:
-        while self.parser.parse():
-            pass
-        return True
-
-
-class TypeParser(BaseParser):
-
-    def parse(self) -> bool:
+    @abstractmethod
+    def starts(self) -> BaseParser:
         pass
 
-        return ChoiceParser(
-            self.analyzer,
-            [
-                LexParser(self.analyzer, Lex.KEYWORD_INT),
-                LexParser(self.analyzer, Lex.KEYWORD_FLOAT),
-                LexParser(self.analyzer, Lex.KEYWORD_BOOL)
-            ]
-        ).parse()
+    def setup(self) -> BaseParser:
+        return None
+
+    def on_success(self, lexemes: List[Lexeme]):
+        pass
+
+    def on_error(self):
+        pass
+
+    def __call__(self):
+        start_success, start_lexemes, start_flag = self.starts()()
+        if not start_success:
+            return start_success, start_lexemes, start_flag
+
+        if not start_flag:
+            analyzer.new_lex()
+
+        body = self.setup()
+
+        if body is None:
+            self.on_success(start_lexemes)
+            return start_success, start_lexemes, start_flag
+
+        body_success, body_lexemes, body_flag = body()
+
+        lexemes = [*start_lexemes, *body_lexemes]
+
+        if body_success:
+            if not body_flag:
+                analyzer.new_lex()
+            self.on_success(lexemes)
+            return True, lexemes, True
+        else:
+            self.on_error()
+            return False, lexemes, True
+
+
+class TypeParser(CombineParser):
+
+    def starts(self) -> BaseParser:
+        return (
+                LexParser(Lex.KEYWORD_INT) |
+                LexParser(Lex.KEYWORD_FLOAT) |
+                LexParser(Lex.KEYWORD_BOOL)
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class DefineOperatorParser(CombineParser):
+
+    def starts(self) -> BaseParser:
+        return TypeParser()
+
+    def setup(self) -> BaseParser:
+        return (
+                LexParser(Lex.IDENTIFIER) &
+                (
+                        LexParser(Lex.SEPARATOR_COMMA) &
+                        LexParser(Lex.IDENTIFIER)
+                ).many()
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class OperatorParser(CombineParser):
+
+    def starts(self) -> BaseParser:
+        return (
+                CombineOperatorParser() |
+                AssignmentOperatorParser() |
+                BranchOperatorParser() |
+                ForLoopOperatorParser() |
+                WhileLoopOperatorParser() |
+                InputOperatorParser() |
+                OutputOperatorParser()
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class CombineOperatorParser(CombineParser):
+
+    def starts(self) -> BaseParser:
+        return LexParser(Lex.KEYWORD_BEGIN)
+
+    def setup(self) -> BaseParser:
+        return (
+                OperatorParser() &
+                (
+                        LexParser(Lex.SEPARATOR_SEMICOLON) &
+                        OperatorParser()
+                ).many() &
+                LexParser(Lex.KEYWORD_END)
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class OperationSumGroupParser(CombineParser):
+
+    def starts(self) -> BaseParser:
+        return (
+                LexParser(Lex.SEPARATOR_PLUS) | LexParser(Lex.SEPARATOR_MINUS) | LexParser(Lex.SEPARATOR_OR)
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class OperationMulGroupParser(CombineParser):
+    def starts(self) -> BaseParser:
+        return (
+                LexParser(Lex.SEPARATOR_MULTIPLICATION) |
+                LexParser(Lex.SEPARATOR_DIVISION) |
+                LexParser(Lex.SEPARATOR_AND)
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class OperationRelationGroupParser(CombineParser):
+    def starts(self) -> BaseParser:
+        return (
+                LexParser(Lex.SEPARATOR_NOT_EQUALS) |
+                LexParser(Lex.SEPARATOR_EQUALS) |
+                LexParser(Lex.SEPARATOR_LT) |
+                LexParser(Lex.SEPARATOR_LTE) |
+                LexParser(Lex.SEPARATOR_GT) |
+                LexParser(Lex.SEPARATOR_GTE)
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class SumParser(CombineParser):
+
+    def starts(self) -> BaseParser:
+        return MulParser()
+
+    def setup(self) -> BaseParser:
+        return (
+                OperationSumGroupParser() &
+                MulParser()
+        ).many()
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class NumberParser(CombineParser):
+    def starts(self) -> BaseParser:
+        return (
+                LexParser(Lex.NUMBER_BIN) |
+                LexParser(Lex.NUMBER_OCT) |
+                LexParser(Lex.NUMBER_HEX) |
+                LexParser(Lex.NUMBER_DEC) |
+                LexParser(Lex.NUMBER_FRACTIONAL)
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class BoolConstantParser(CombineParser):
+    def starts(self) -> BaseParser:
+        return (
+                LexParser(Lex.KEYWORD_TRUE) |
+                LexParser(Lex.KEYWORD_FALSE)
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class MulParser(CombineParser):
+    def starts(self) -> BaseParser:
+        return FactorParser()
+
+    def setup(self) -> BaseParser:
+        return (
+                OperationMulGroupParser() &
+                FactorParser()
+        ).many()
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class ExpressionInBracketsParser(CombineParser):
+    def starts(self) -> BaseParser:
+        return LexParser(Lex.SEPARATOR_LEFT_BRACKET)
+
+    def setup(self) -> BaseParser:
+        return (
+                ExpressionParser() &
+                LexParser(Lex.SEPARATOR_RIGHT_BRACKET)
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class NotOperatorParser(CombineParser):
+    def starts(self) -> BaseParser:
+        return LexParser(Lex.SEPARATOR_NOT)
+
+    def setup(self) -> BaseParser:
+        return FactorParser()
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class FactorParser(CombineParser):
+    def starts(self) -> BaseParser:
+        return (
+                LexParser(Lex.IDENTIFIER) |
+                NumberParser() |
+                BoolConstantParser() |
+                NotOperatorParser() |
+                ExpressionInBracketsParser()
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class ExpressionParser(CombineParser):
+    def starts(self) -> BaseParser:
+        return SumParser()
+
+    def setup(self) -> BaseParser:
+        return (
+                OperationRelationGroupParser() &
+                SumParser()
+        ).many()
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class AssignmentOperatorParser(CombineParser):
+    def starts(self) -> BaseParser:
+        return LexParser(Lex.IDENTIFIER)
+
+    def setup(self) -> BaseParser:
+        return (
+                LexParser(Lex.SEPARATOR_ASSIGNMENT) &
+                ExpressionParser()
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class BranchOperatorParser(CombineParser):
+    def starts(self) -> BaseParser:
+        return LexParser(Lex.KEYWORD_IF)
+
+    def setup(self) -> BaseParser:
+        return (
+                LexParser(Lex.SEPARATOR_LEFT_BRACKET) &
+                ExpressionParser() &
+                LexParser(Lex.SEPARATOR_RIGHT_BRACKET) &
+                OperatorParser() &
+                (
+                        LexParser(Lex.KEYWORD_ELSE) & OperatorParser()
+                ).opt()
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+    def on_error(self):
+        analyzer.throw_error("Expected if operator body...")
+
+
+class ForLoopOperatorParser(CombineParser):
+    def starts(self) -> BaseParser:
+        return LexParser(Lex.KEYWORD_FOR)
+
+    def setup(self) -> BaseParser:
+        return (
+                AssignmentOperatorParser() &
+                LexParser(Lex.KEYWORD_TO) &
+                ExpressionParser() &
+                (
+                        LexParser(Lex.KEYWORD_STEP) &
+                        ExpressionParser()
+                ).opt() &
+                OperatorParser() &
+                LexParser(Lex.KEYWORD_NEXT)
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class WhileLoopOperatorParser(CombineParser):
+    def starts(self) -> BaseParser:
+        return LexParser(Lex.KEYWORD_WHILE)
+
+    def setup(self) -> BaseParser:
+        return (
+                LexParser(Lex.SEPARATOR_LEFT_BRACKET) &
+                ExpressionParser() &
+                LexParser(Lex.SEPARATOR_RIGHT_BRACKET) &
+                OperatorParser()
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class InputOperatorParser(CombineParser):
+    def starts(self) -> BaseParser:
+        return LexParser(Lex.KEYWORD_READLN)
+
+    def setup(self) -> BaseParser:
+        return (
+                LexParser(Lex.IDENTIFIER) &
+                (
+                        LexParser(Lex.SEPARATOR_COMMA) &
+                        LexParser(Lex.IDENTIFIER)
+                ).many()
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class OutputOperatorParser(CombineParser):
+    def starts(self) -> BaseParser:
+        return LexParser(Lex.KEYWORD_WRITELN)
+
+    def setup(self) -> BaseParser:
+        return (
+                ExpressionParser() &
+                (
+                        LexParser(Lex.SEPARATOR_COMMA) &
+                        ExpressionParser()
+                ).many()
+        )
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
+
+
+class ProgramParser:
+    def __call__(self):
+        return (
+                LexParser(Lex.SEPARATOR_LEFT_FIGURE_BRACKET) &
+                (
+                        (
+                                DefineOperatorParser() |
+                                OperatorParser()
+                        ) &
+                        LexParser(Lex.SEPARATOR_SEMICOLON)
+                ).at_least_once() &
+                LexParser(Lex.SEPARATOR_RIGHT_FIGURE_BRACKET)
+        )()
