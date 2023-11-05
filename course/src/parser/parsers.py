@@ -7,25 +7,17 @@ from src.lang import *
 analyzer = None
 
 
-def callback(callback_func=None):
-    if callback_func is None:
-        raise ValueError("Пустой callback")
-
-    def inner(method):
-        def wrapper(*args, **kwargs):
-            result = method(*args, **kwargs)
-            callback_func(method, result)
-            return result
-
-        return wrapper
-
-    return inner
-
-
 def simple_callback(method, lexemes):
-    if lexemes[0]:
+    if lexemes[0] and (
+            isinstance(method, ExpressionParser) or
+            isinstance(method, SumParser) or
+            isinstance(method, MulParser) or
+            isinstance(method, FactorParser) or
+            isinstance(method, ExpressionInBracketsParser)
+    ):
         print()
         print(method)
+        # pprint(lexemes)
         pprint([i.value for i in lexemes])
 
 
@@ -159,6 +151,8 @@ class LexParser(BaseParser):
 
 
 class CombineParser(BaseParser):
+    error_message: str = ""
+
     def __init__(self):
         super().__init__()
 
@@ -173,7 +167,7 @@ class CombineParser(BaseParser):
         pass
 
     def on_error(self):
-        pass
+        analyzer.throw_error(self.error_message)
 
     def __call__(self):
         start_success, start_lexemes, start_flag = self.starts()()
@@ -217,6 +211,7 @@ class TypeParser(CombineParser):
 
 
 class DefineOperatorParser(CombineParser):
+    error_message = "Ожидалось перечисление идентификаторов для объявления"
 
     def starts(self) -> BaseParser:
         return TypeParser()
@@ -235,6 +230,7 @@ class DefineOperatorParser(CombineParser):
 
 
 class OperatorParser(CombineParser):
+    error_message = "Ошибка в начале/конце оператора"
 
     def starts(self) -> BaseParser:
         return (
@@ -252,6 +248,7 @@ class OperatorParser(CombineParser):
 
 
 class CombineOperatorParser(CombineParser):
+    error_message = "Неверно задан составной оператор"
 
     def starts(self) -> BaseParser:
         return LexParser(Lex.KEYWORD_BEGIN)
@@ -363,6 +360,8 @@ class MulParser(CombineParser):
 
 
 class ExpressionInBracketsParser(CombineParser):
+    error_message = "В скобках ожидалось выражение"
+
     def starts(self) -> BaseParser:
         return LexParser(Lex.SEPARATOR_LEFT_BRACKET)
 
@@ -377,6 +376,8 @@ class ExpressionInBracketsParser(CombineParser):
 
 
 class NotOperatorParser(CombineParser):
+    error_message = "Ожидался операнд"
+
     def starts(self) -> BaseParser:
         return LexParser(Lex.SEPARATOR_NOT)
 
@@ -416,6 +417,8 @@ class ExpressionParser(CombineParser):
 
 
 class AssignmentOperatorParser(CombineParser):
+    error_message = "Ошибка в операторе присваивания"
+
     def starts(self) -> BaseParser:
         return LexParser(Lex.IDENTIFIER)
 
@@ -430,6 +433,8 @@ class AssignmentOperatorParser(CombineParser):
 
 
 class BranchOperatorParser(CombineParser):
+    error_message = "Неверно задан условный оператор"
+
     def starts(self) -> BaseParser:
         return LexParser(Lex.KEYWORD_IF)
 
@@ -447,11 +452,10 @@ class BranchOperatorParser(CombineParser):
     def on_success(self, lexemes: List[Lexeme]):
         simple_callback(self, lexemes)
 
-    def on_error(self):
-        analyzer.throw_error("Expected if operator body...")
-
 
 class ForLoopOperatorParser(CombineParser):
+    error_message = "Неверно задан оператор цикла со счётчиком"
+
     def starts(self) -> BaseParser:
         return LexParser(Lex.KEYWORD_FOR)
 
@@ -473,6 +477,8 @@ class ForLoopOperatorParser(CombineParser):
 
 
 class WhileLoopOperatorParser(CombineParser):
+    error_message = "Неверно задан цикл с предусловием"
+
     def starts(self) -> BaseParser:
         return LexParser(Lex.KEYWORD_WHILE)
 
@@ -489,6 +495,8 @@ class WhileLoopOperatorParser(CombineParser):
 
 
 class InputOperatorParser(CombineParser):
+    error_message = "Неверно задан оператор ввода, ожидался идентификатор"
+
     def starts(self) -> BaseParser:
         return LexParser(Lex.KEYWORD_READLN)
 
@@ -506,6 +514,8 @@ class InputOperatorParser(CombineParser):
 
 
 class OutputOperatorParser(CombineParser):
+    error_message = "Неверно задан оператор вывода, ожидалось выражение"
+
     def starts(self) -> BaseParser:
         return LexParser(Lex.KEYWORD_WRITELN)
 
@@ -522,10 +532,14 @@ class OutputOperatorParser(CombineParser):
         simple_callback(self, lexemes)
 
 
-class ProgramParser:
-    def __call__(self):
+class ProgramParser(CombineParser):
+    error_message = "Операторы должны разделяться символом ';'"
+
+    def starts(self) -> BaseParser:
+        return LexParser(Lex.SEPARATOR_LEFT_FIGURE_BRACKET)
+
+    def setup(self):
         return (
-                LexParser(Lex.SEPARATOR_LEFT_FIGURE_BRACKET) &
                 (
                         (
                                 DefineOperatorParser() |
@@ -534,4 +548,35 @@ class ProgramParser:
                         LexParser(Lex.SEPARATOR_SEMICOLON)
                 ).at_least_once() &
                 LexParser(Lex.SEPARATOR_RIGHT_FIGURE_BRACKET)
-        )()
+        )
+
+    def __call__(self):
+        start_success, start_lexemes, start_flag = self.starts()()
+        if not start_success:
+            analyzer.throw_error("Программа должна начинаться с символа '{'")
+            return start_success, start_lexemes, start_flag
+
+        if not start_flag:
+            analyzer.new_lex()
+
+        body = self.setup()
+
+        if body is None:
+            self.on_success(start_lexemes)
+            return start_success, start_lexemes, start_flag
+
+        body_success, body_lexemes, body_flag = body()
+
+        lexemes = [*start_lexemes, *body_lexemes]
+
+        if body_success:
+            if not body_flag:
+                analyzer.new_lex()
+            self.on_success(lexemes)
+            return True, lexemes, True
+        else:
+            self.on_error()
+            return False, lexemes, True
+
+    def on_success(self, lexemes: List[Lexeme]):
+        simple_callback(self, lexemes)
