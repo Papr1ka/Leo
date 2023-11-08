@@ -10,7 +10,7 @@ from src.tree import ASTAssignment, ASTBinOperation, ASTConst, ASTDeclaration, A
     ASTTyped, ASTUOperation, ASTVar
 
 
-class SyntaxParser:
+class Parser:
     lexer: Generator
     lexeme: Lexeme
 
@@ -38,11 +38,12 @@ class SyntaxParser:
         else:
             expected(lex, self.lexeme)
 
-    def parse(self):
+    def parse(self) -> ASTNode:
         ast = self.program_parser()
-        while ast != None:
-            self.print(ast)
-            ast = ast.next_node
+        return ast
+        # while ast != None:
+        #     self.print(ast)
+        #     ast = ast.next_node
 
     def print(self, node: ASTNode):
         if isinstance(node, ASTDeclaration):
@@ -284,6 +285,11 @@ class SyntaxParser:
         node_assignment = self.operator_assignment_parser()
         self.skip_lex(Lex.KEYWORD_TO)
         node_condition = self.expression_parser()
+        node_condition = ASTBinOperation(
+            node_assignment.var,
+            node_condition,
+            BinOperations.lt
+        )
 
         if self.lexeme.lex == Lex.KEYWORD_STEP:
             self.new_lex()

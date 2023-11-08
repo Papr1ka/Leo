@@ -40,6 +40,9 @@ class BaseType(ABC):
     def not_(self):
         return Boolean(not bool(self.value))
 
+    def __str__(self):
+        return str(self.value)
+
 
 class Number(BaseType):
 

@@ -123,6 +123,7 @@ class Lex(Enum):
     SEPARATOR_COMMA = 42
 
     UNRESOLVED = 0
+    EOF = -1
 
 
 KEYWORDS = {

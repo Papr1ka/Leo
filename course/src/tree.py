@@ -180,8 +180,8 @@ class ASTIn(ASTNode):
     variables: ASTVar  # список
 
     def __init__(self, variables: ASTVar, parent=None):
-        super().__init__(ASTType.DECL, parent)
-        self.vars = variables
+        super().__init__(ASTType.IN, parent)
+        self.variables = variables
 
 
 class ASTOut(ASTNode):
@@ -191,5 +191,5 @@ class ASTOut(ASTNode):
     expressions: ASTTyped  # список
 
     def __init__(self, expressions: ASTTyped, parent=None):
-        super().__init__(ASTType.DECL, parent)
+        super().__init__(ASTType.OUT, parent)
         self.expressions = expressions

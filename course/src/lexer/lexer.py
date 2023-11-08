@@ -63,7 +63,7 @@ class Lexer():
     error_message: str
 
     def __init__(self, source: str):
-        self.source = source
+        self.source = source + "\n"
         self.index = 0
         self.state = States.START
         self.factory = HandlerFactory()
