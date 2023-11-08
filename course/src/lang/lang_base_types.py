@@ -20,6 +20,7 @@ class BaseType(ABC):
         return Boolean(self.value.__eq__(other.value))
 
     def lt(self, other):
+        tmp = self.value.__lt__(other.value)
         return Boolean(self.value.__lt__(other.value))
 
     def lte(self, other):

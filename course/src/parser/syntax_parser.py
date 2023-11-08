@@ -159,14 +159,14 @@ class Parser:
         return h_head, tail
 
     def identifier_assignment(self, identifier: Lexeme):
-        pass
+        find_name(identifier.value).is_assigned = True
 
     def factor_parser(self) -> ASTTyped:
         if self.lexeme.lex in (Lex.IDENTIFIER, Lex.NUMBER_BIN, Lex.NUMBER_OCT,
                                Lex.NUMBER_DEC, Lex.NUMBER_HEX, Lex.NUMBER_FRACTIONAL,
                                Lex.KEYWORD_TRUE, Lex.KEYWORD_FALSE, Lex.SEPARATOR_NOT,
                                Lex.SEPARATOR_LEFT_BRACKET):
-            if self.lexeme == Lex.SEPARATOR_NOT:
+            if self.lexeme.lex == Lex.SEPARATOR_NOT:
                 self.new_lex()
                 lex_exp_start = self.lexeme
                 node = self.factor_parser()
@@ -193,6 +193,9 @@ class Parser:
                     return ASTConst(Types.float, Float.from_string(factor.value))
                 elif factor.lex == Lex.IDENTIFIER:
                     t_item = find_name(factor.value)
+                    if t_item is None or not t_item.is_assigned:
+                        ctx_error("Переменная не инициализированна", factor)
+
                     return ASTVar(t_item.t_type, factor.value)
                 return ASTConst(Types.int, Integer.from_string(factor.value))
         else:
@@ -261,6 +264,7 @@ class Parser:
             ctx_error(f"Присваиваемое выражение имеет отличный тип от типа переменной, \
 ожидается {identifier_type.t_type.name}", exp_start_lex)
         var = ASTVar(identifier_type.t_type, identifier_type.name)
+        self.identifier_assignment(identifier)
 
         return ASTAssignment(var, node_expression)
 
@@ -271,7 +275,7 @@ class Parser:
         self.skip_lex(Lex.SEPARATOR_RIGHT_BRACKET)
         node_branch, _ = self.operator_parser()
 
-        if self.lexeme == Lex.KEYWORD_ELSE:
+        if self.lexeme.lex == Lex.KEYWORD_ELSE:
             self.new_lex()
             node_else_branch, _ = self.operator_parser()
 
@@ -284,7 +288,11 @@ class Parser:
         self.skip_lex(Lex.KEYWORD_FOR)
         node_assignment = self.operator_assignment_parser()
         self.skip_lex(Lex.KEYWORD_TO)
+        lex_expression_start = self.lexeme
         node_condition = self.expression_parser()
+        if node_condition.t_type == Types.bool:
+            ctx_error("Условие цикла for должно быть числом", lex_expression_start)
+
         node_condition = ASTBinOperation(
             node_assignment.var,
             node_condition,
@@ -331,7 +339,7 @@ class Parser:
         var = find_name(identifier.value)
         if var is None:
             ctx_error("Переменная не объявлена", identifier)
-
+        self.identifier_assignment(identifier)
         self.new_lex()
 
         head = ASTVar(var.t_type, var.name)
@@ -345,7 +353,7 @@ class Parser:
             var = find_name(identifier.value)
             if var is None:
                 ctx_error("Переменная не объявлена", identifier)
-
+            self.identifier_assignment(identifier)
             node.next_node = ASTVar(var.t_type, var.name)
             node = node.next_node
             self.new_lex()

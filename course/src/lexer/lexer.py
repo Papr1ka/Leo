@@ -1,6 +1,7 @@
 from src.constants import BASE_SEPARATORS, KEYWORDS, Lex, Lexeme, States
 from src.errors import lex_error
 from src.lexer.handlers import HandlerFactory
+from src.test_driver import get_source
 
 """
 Приблизительная оценка:
@@ -62,8 +63,8 @@ class Lexer():
     # сообщение об ошибке последней нераспознанной лексемы
     error_message: str
 
-    def __init__(self, source: str):
-        self.source = source + "\n"
+    def __init__(self):
+        self.source = get_source()
         self.index = 0
         self.state = States.START
         self.factory = HandlerFactory()

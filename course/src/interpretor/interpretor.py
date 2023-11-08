@@ -6,6 +6,7 @@ from src.tree import ASTAssignment, ASTBinOperation, ASTConst, ASTIf, ASTIn, AST
     ASTTyped, ASTUOperation, \
     ASTVar
 from .runtime_memory import load, store
+from ..test_driver import setup_source
 
 
 def run(ast: ASTNode):
@@ -93,7 +94,8 @@ def exec_operator(ast: ASTNode):
         node = ast.variables
         while node is not None:
             input_data = input()
-            lexer = Lexer(input_data + "\n")
+            setup_source(input_data)
+            lexer = Lexer()
 
             lexeme = next(iter(lexer.get_lex()))
             if ast.variables.t_type == Types.int:
