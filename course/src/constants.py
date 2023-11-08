@@ -144,6 +144,54 @@ KEYWORDS = {
     'writeln': Lex.KEYWORD_WRITELN,
 }
 
+semantic = {
+    Lex.KEYWORD_BEGIN: "begin",
+    Lex.KEYWORD_BOOL: "bool",
+    Lex.KEYWORD_ELSE: "else",
+    Lex.KEYWORD_END: "end",
+    Lex.KEYWORD_FALSE: "false",
+    Lex.KEYWORD_FLOAT: "float",
+    Lex.KEYWORD_FOR: "for",
+    Lex.KEYWORD_IF: "if",
+    Lex.KEYWORD_INT: "int",
+    Lex.KEYWORD_NEXT: "next",
+    Lex.KEYWORD_READLN: "readln",
+    Lex.KEYWORD_STEP: "step",
+    Lex.KEYWORD_TO: "to",
+    Lex.KEYWORD_TRUE: "true",
+    Lex.KEYWORD_WHILE: "while",
+    Lex.KEYWORD_WRITELN: "writeln",
+
+    Lex.IDENTIFIER: "идентификатор",
+
+    Lex.NUMBER_BIN: "двоичное число",
+    Lex.NUMBER_OCT: "восьмиричное число",
+    Lex.NUMBER_DEC: "десятичное число",
+    Lex.NUMBER_HEX: "шестнадцатиричное число",
+    Lex.NUMBER_FRACTIONAL: "дробное число",
+
+    Lex.SEPARATOR_AND: "and",
+    Lex.SEPARATOR_ASSIGNMENT: ":=",
+    Lex.SEPARATOR_DIVISION: "/",
+    Lex.SEPARATOR_EQUALS: "==",
+    Lex.SEPARATOR_GT: ">",
+    Lex.SEPARATOR_GTE: ">=",
+    Lex.SEPARATOR_LEFT_BRACKET: "(",
+    Lex.SEPARATOR_LEFT_FIGURE_BRACKET: "{",
+    Lex.SEPARATOR_LT: "<",
+    Lex.SEPARATOR_LTE: "<=",
+    Lex.SEPARATOR_MINUS: "-",
+    Lex.SEPARATOR_MULTIPLICATION: "*",
+    Lex.SEPARATOR_NOT: "!",
+    Lex.SEPARATOR_NOT_EQUALS: "!=",
+    Lex.SEPARATOR_OR: "||",
+    Lex.SEPARATOR_PLUS: "+",
+    Lex.SEPARATOR_RIGHT_BRACKET: ")",
+    Lex.SEPARATOR_RIGHT_FIGURE_BRACKET: "}",
+    Lex.SEPARATOR_SEMICOLON: ";",
+    Lex.SEPARATOR_COMMA: ",",
+}
+
 
 @dataclass
 class Lexeme:
@@ -152,8 +200,3 @@ class Lexeme:
     line: int
     symbol: int
     error: str
-
-
-class LangSyntaxException(Exception):
-    def __init__(self, message, line, symbol):
-        super().__init__(f"Строка {line}, Символ {symbol}\nСинтаксическая ошибка: {message}")

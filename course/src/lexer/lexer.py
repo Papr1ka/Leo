@@ -1,4 +1,5 @@
 from src.constants import BASE_SEPARATORS, KEYWORDS, Lex, Lexeme, States
+from src.errors import lex_error
 from src.lexer.handlers import HandlerFactory
 
 """
@@ -96,7 +97,7 @@ class Lexer():
         """
         self.unget_char()
         if lex == Lex.UNRESOLVED:
-            return Lexeme(lex, self.buffer, self.line, self.symbol, self.error_message)
+            lex_error(Lexeme(lex, self.buffer, self.line, self.symbol, self.error_message))
         return Lexeme(lex, self.buffer, self.line, self.symbol, "")
 
     def get_lex(self):
