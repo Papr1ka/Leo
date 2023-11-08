@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from enum import Enum
 from typing import Union
 
 from src.constants import Lex
@@ -131,3 +132,61 @@ TYPES = {
     Lex.KEYWORD_FLOAT: Float,
     Lex.KEYWORD_BOOL: Boolean
 }
+
+
+class Types(Enum):
+    int = 0
+    float = 1
+    bool = 2
+
+
+lex_to_type_table = {
+    Lex.KEYWORD_INT: Types.int,
+    Lex.KEYWORD_FLOAT: Types.float,
+    Lex.KEYWORD_BOOL: Types.bool
+}
+
+
+def get_type_number_from_lex(lex: Lex) -> Types:
+    r = lex_to_type_table.get(lex)
+    if r is not None:
+        return r
+    raise ValueError("Тип не определён")
+
+
+class BinOperations(Enum):
+    sum = 0  # сумма
+    diff = 1  # разность
+    mul = 2  # произведение
+    div = 3  # частное
+    alt = 4  # операция или
+    con = 5  # операция и
+    eq = 6  # ==
+    neq = 7  # !=
+    gt = 8  # >
+    gte = 9  # >=
+    lt = 10  # <
+    lte = 11  # <=
+
+
+lex_to_bin_op_table = {
+    Lex.SEPARATOR_PLUS: BinOperations.sum,
+    Lex.SEPARATOR_MINUS: BinOperations.diff,
+    Lex.SEPARATOR_MULTIPLICATION: BinOperations.mul,
+    Lex.SEPARATOR_DIVISION: BinOperations.div,
+    Lex.SEPARATOR_OR: BinOperations.alt,
+    Lex.SEPARATOR_AND: BinOperations.con,
+    Lex.SEPARATOR_EQUALS: BinOperations.eq,
+    Lex.SEPARATOR_NOT_EQUALS: BinOperations.neq,
+    Lex.SEPARATOR_GT: BinOperations.gt,
+    Lex.SEPARATOR_GTE: BinOperations.gte,
+    Lex.SEPARATOR_LT: BinOperations.lt,
+    Lex.SEPARATOR_LTE: BinOperations.lte
+}
+
+
+def get_bin_operation_from_lex(lex: Lex) -> BinOperations:
+    r = lex_to_bin_op_table.get(lex)
+    if r is not None:
+        return r
+    raise ValueError("Операция не определён")

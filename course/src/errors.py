@@ -16,3 +16,8 @@ def expected_msg(msg: str, actual: Lexeme):
     print(
         f"Синтаксическая ошибка: ожидалось - {msg}, обнаружено - '{actual.value}' Строка {actual.line}, Символ {actual.symbol}")
     exit(2)
+
+
+def ctx_error(msg: str, lex: Lexeme):
+    print(f"Контекстная ошибка: {msg} ('{lex.value}' Строка {lex.line}, Символ {lex.symbol})")
+    exit(3)
