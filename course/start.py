@@ -10,7 +10,7 @@ if __name__ == '__main__':
 """
 
     # или считать из файла
-    with open("./examples/ex2") as file:
+    with open("./examples/ex1") as file:
         file_contents = "".join(file.readlines())
 
     # передать в лексический анализатор
