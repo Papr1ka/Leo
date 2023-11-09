@@ -4,7 +4,7 @@ from src.parser.syntax_parser import Parser
 from src.test_driver import setup_source
 
 if __name__ == '__main__':
-    setup_source("./examples/debug.leo")
+    setup_source("./examples/leonid.leo")
     lexer = Lexer()
 
     parser = Parser(lexer)

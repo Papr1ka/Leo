@@ -150,6 +150,19 @@ lex_to_type_table = {
     Lex.KEYWORD_BOOL: Types.bool
 }
 
+type_to_type_table = {
+    Integer: Types.int,
+    Float: Types.float,
+    Boolean: Types.bool
+}
+
+
+def type_to_type(type: Union[Integer, Float, Boolean]):
+    r = type_to_type_table.get(type.__class__)
+    if r is not None:
+        return r
+    raise ValueError("Тип не определён")
+
 
 def get_type_number_from_lex(lex: Lex) -> Types:
     r = lex_to_type_table.get(lex)
@@ -172,6 +185,15 @@ class BinOperations(Enum):
     lt = 10  # <
     lte = 11  # <=
 
+
+operator_relation = [
+    BinOperations.lt,
+    BinOperations.lte,
+    BinOperations.gt,
+    BinOperations.gte,
+    BinOperations.eq,
+    BinOperations.neq
+]
 
 lex_to_bin_op_table = {
     Lex.SEPARATOR_PLUS: BinOperations.sum,

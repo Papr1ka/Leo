@@ -1,10 +1,14 @@
 {
     int primeNumberCount, number, i, j;
+    int n;
 
-    readln primeNumberCount;
+    readln n;
+
+    primeNumberCount := 100;
+
     number := 0;
 
-    while (primeNumberCount > 0)
+    while ((primeNumberCount > 0) && (number < n))
     begin
     number := number + 1;
     j := 0;

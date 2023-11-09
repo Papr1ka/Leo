@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Any, Union
 
-from src.lang import BinOperations, Types
+from src.lang import BinOperations, Types, operator_relation
 
 
 class ASTType(Enum):
@@ -38,6 +38,7 @@ class ASTTyped(ASTNode):
     def __init__(self, t_type: Types, a_type: ASTType):
         super().__init__(a_type)
         self.t_type = t_type
+
 
 class ASTConst(ASTTyped):
     """
@@ -98,7 +99,10 @@ class ASTBinOperation(ASTTyped):
     operation: BinOperations
 
     def __init__(self, left: ASTTyped, right: ASTTyped, operation: BinOperations):
-        super().__init__(left.t_type, ASTType.BIN_OP)
+        if operation in operator_relation:
+            super().__init__(Types.bool, ASTType.BIN_OP)
+        else:
+            super().__init__(left.t_type, ASTType.BIN_OP)
         self.left = left
         self.right = right
         self.operation = operation
