@@ -1,12 +1,13 @@
 {
     int i;
     int j;
+    float k;
 
     j := 0-1;
 
-    for i := 100 to 1000 step 100
+    for i := 0 to 10 step 1
     begin
-    if (i / 11 * 11 == i) writeln i
+    writeln i
     end
     next;
 }

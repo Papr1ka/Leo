@@ -2,7 +2,8 @@ from typing import Union
 
 from src.lang import BinOperations, Boolean, Float, Integer, Types
 from src.lexer import Lexer
-from src.tree import ASTAssignment, ASTBinOperation, ASTConst, ASTIf, ASTIn, ASTLoop, ASTNode, ASTOut, ASTType, \
+from src.tree import ASTAssignment, ASTBinOperation, ASTConst, ASTForLoop, ASTIf, ASTIn, ASTLoop, ASTNode, ASTOut, \
+    ASTType, \
     ASTTyped, ASTUOperation, \
     ASTVar
 from .runtime_memory import load, store
@@ -89,6 +90,23 @@ def exec_operator(ast: ASTNode):
                 exec_operator(node)
                 node = node.next_node
             condition = exec_expression(ast.condition)
+
+    elif ast.a_type == ASTType.ForLoop:
+        ast: ASTForLoop
+        condition: Boolean = exec_expression(ast.condition)
+        step: ASTConst = ASTConst(ast.step.t_type, exec_expression(ast.step))
+        while condition.value:
+            node = ast.body
+            while node is not None:
+                exec_operator(node)
+                node = node.next_node
+            exec_operator(
+                ASTAssignment(
+                    ast.var, ASTBinOperation(ast.var, step, BinOperations.sum)
+                )
+            )
+            condition = exec_expression(ast.condition)
+
     elif ast.a_type == ASTType.IN:
         ast: ASTIn
         node = ast.variables

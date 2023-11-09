@@ -2,13 +2,12 @@ from typing import Generator, Tuple
 
 from src.constants import Lex, Lexeme
 from src.errors import ctx_error, expected, expected_msg
-from src.interpretor.interpretor import exec_operator, exec_expression
 from src.lang import get_type_number_from_lex, Types
-from src.lang.lang_base_types import BinOperations, Boolean, Float, get_bin_operation_from_lex, Integer, \
-    type_to_type_table, type_to_type
+from src.lang.lang_base_types import Boolean, Float, get_bin_operation_from_lex, Integer
 from src.lexer import Lexer
 from src.parser.name_table import find_name, new_name
-from src.tree import ASTAssignment, ASTBinOperation, ASTConst, ASTDeclaration, ASTIf, ASTIn, ASTLoop, ASTNode, ASTOut, \
+from src.tree import ASTAssignment, ASTBinOperation, ASTConst, ASTDeclaration, ASTForLoop, ASTIf, ASTIn, ASTLoop, \
+    ASTNode, ASTOut, \
     ASTTyped, ASTUOperation, ASTVar
 
 
@@ -207,7 +206,8 @@ class Parser:
             operation = self.lexeme
             self.new_lex()
             right_node = self.factor_parser()
-            if (left_node.t_type == Types.bool or right_node.t_type == Types.bool) and operation.lex != Lex.SEPARATOR_AND:
+            if (
+                    left_node.t_type == Types.bool or right_node.t_type == Types.bool) and operation.lex != Lex.SEPARATOR_AND:
                 ctx_error("Неподдерживаемая операция для типа bool, возможно вы имели ввиду '&&'", operation)
             elif left_node.t_type != right_node.t_type:
                 ctx_error("Типы операндов не совпадают", operation)
@@ -282,55 +282,33 @@ class Parser:
         return ASTIf(node_condition, node_branch)
 
     def operator_for_parser(self) -> Tuple[ASTNode, ASTNode]:
-        node_step = None
         self.skip_lex(Lex.KEYWORD_FOR)
         lex_assignment_start = self.lexeme
         node_assignment = self.operator_assignment_parser()
-        if node_assignment.var.t_type == Types.bool:
-            ctx_error("Переменная цикла for должна быть числом, иначе используйте while", lex_assignment_start)
+        if node_assignment.var.t_type != Types.int:
+            ctx_error("Переменная цикла for должна быть типа int, иначе используйте while", lex_assignment_start)
         self.skip_lex(Lex.KEYWORD_TO)
         lex_expression_start = self.lexeme
-        node_condition_expression = self.expression_parser()
-        if node_condition_expression.t_type == Types.bool:
-            ctx_error("Условие цикла for должно быть числом", lex_expression_start)
-        if node_condition_expression.t_type != node_assignment.var.t_type:
-            ctx_error(f"Несоответствие типоа, переменная цикла должна быть типа \
-{node_assignment.var.name} ({node_assignment.var.t_type.name})", lex_expression_start)
-
-        node_condition = ASTBinOperation(
-            node_assignment.var,
-            node_condition_expression,
-            BinOperations.lt
-        )
+        node_expression = self.expression_parser()
+        if node_expression.t_type != Types.int:
+            ctx_error("Условие цикла for должно быть типа int", lex_expression_start)
 
         if self.lexeme.lex == Lex.KEYWORD_STEP:
             self.new_lex()
             lex_expression_start = self.lexeme
-            node_expression = self.expression_parser()
+            node_step = self.expression_parser()
 
-            if node_assignment.var.t_type != node_expression.t_type:
-                ctx_error(f"Несоответствие типов, выражение в step должно быть типа \
-{node_assignment.var.name} ({node_assignment.var.t_type.name})", lex_expression_start)
+            if node_step.t_type != Types.int:
+                ctx_error(f"Несоответствие типов, выражение в step должно быть типа int \
+({node_assignment.var.t_type.name})", lex_expression_start)
+        else:
+            node_step = ASTConst(Types.int, Integer(1))
 
-            node_expression_value = exec_expression(node_expression)
-            node_const_step = ASTConst(type_to_type(node_expression_value), node_expression_value)
-            if node_expression_value.value < 0:
-                node_condition = ASTBinOperation(
-                    node_assignment.var,
-                    node_condition_expression,
-                    BinOperations.gt
-                )
-
-            node_step = ASTAssignment(node_assignment.var,
-                                      ASTBinOperation(node_assignment.var, node_const_step, BinOperations.sum))
-
-        node_body_start, node_body_end = self.operator_parser()
-        if node_step is not None:
-            node_body_end.next_node = node_step
+        node_body_start, _ = self.operator_parser()
 
         self.skip_lex(Lex.KEYWORD_NEXT)
 
-        node_loop = ASTLoop(node_condition, node_body_start)
+        node_loop = ASTForLoop(node_assignment.var, node_expression, node_body_start, node_step)
 
         node_assignment.next_node = node_loop
         return node_assignment, node_loop

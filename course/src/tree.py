@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Any, Union
 
-from src.lang import BinOperations, Types, operator_relation
+from src.lang import BinOperations, operator_relation, Types
 
 
 class ASTType(Enum):
@@ -15,6 +15,7 @@ class ASTType(Enum):
     BIN_OP = 7
     CONST = 8
     VAR = 9
+    ForLoop = 10
 
 
 class ASTNode:
@@ -130,6 +131,24 @@ class ASTLoop(ASTNode):
         super().__init__(ASTType.Loop)
         self.condition = condition
         self.body = body
+
+
+class ASTForLoop(ASTNode):
+    """
+    Цикл for
+    step - подразумевается, что вычисляется один раз и превращается в константу
+    """
+    var: ASTVar
+    condition: ASTTyped
+    body: ASTNode
+    step: ASTTyped
+
+    def __init__(self, var: ASTVar, expression: ASTTyped, body: ASTNode, step: ASTTyped):
+        super().__init__(ASTType.ForLoop)
+        self.var = var
+        self.condition = ASTBinOperation(var, expression, BinOperations.lte)
+        self.body = body
+        self.step = step
 
 
 class ASTDeclaration(ASTTyped):
