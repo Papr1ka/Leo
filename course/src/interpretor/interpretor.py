@@ -6,7 +6,7 @@ from src.tree import ASTAssignment, ASTBinOperation, ASTConst, ASTIf, ASTIn, AST
     ASTTyped, ASTUOperation, \
     ASTVar
 from .runtime_memory import load, store
-from ..test_driver import setup_source
+from ..text_driver import setup_source
 
 
 def run(ast: ASTNode):

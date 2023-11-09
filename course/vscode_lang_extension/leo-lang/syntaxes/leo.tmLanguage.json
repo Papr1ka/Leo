@@ -1,0 +1,90 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Leo",
+  "patterns": [
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#constants"
+    },
+    {
+      "include": "#types"
+    },
+    {
+      "include": "#functions"
+    },
+    {
+      "include": "#operators"
+    },
+    {
+      "include": "#vars"
+    }
+  ],
+  "repository": {
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.leo",
+          "match": "\\b(begin|else|end|for|if|next|step|to|while)\\b"
+        }
+      ]
+    },
+    "comments": {
+      "name": "comment.block.leo",
+      "begin": "/\\*",
+      "end": "\\*/"
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.numeric.leo",
+          "match": "\\b(0|1)+(B|b)\\b"
+        },
+        {
+          "name": "constant.numeric.leo",
+          "match": "\\b[0-7]+(O|o)\\b"
+        },
+        {
+          "name": "constant.numeric.leo",
+          "match": "\\b\\d+(D|d)?\\b"
+        },
+        {
+          "name": "constant.numeric.leo",
+          "match": "\\b\\d(\\d|[abcdef]|[ABCDEF])*(H|h)\\b"
+        },
+        {
+          "name": "constant.numeric.leo",
+          "match": "\\b((\\d+)?\\.\\d+((E|e)(\\+|-)?\\d+))|(\\d+((E|e)(\\+|-)?\\d+))\\b"
+        },
+        {
+          "name": "constant.language.leo",
+          "match": "\\b(true|false)\\b"
+        }
+      ]
+    },
+    "types": {
+      "name": "storage.type.leo",
+      "match": "\\b(int|float|bool)\\b"
+    },
+    "vars": {
+      "name": "variable.parameter.leo",
+      "match": "\\b[a-zA-Z]([a-zA-Z]|\\d)*\\b"
+    },
+    "operators": {
+      "name": "keyword.operator.leo",
+      "match": "(\\+|-|\\|\\||\\*|\\/|&&|==|!=|<=|<|>=|>|:=)"
+    },
+    "functions": {
+      "name": "entity.name.function.leo",
+      "match": "\\b(readln|writeln)\\b"
+    }
+  },
+  "scopeName": "source.leo"
+}

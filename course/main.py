@@ -1,5 +1,5 @@
 from src.lexer import Lexer
-from src.test_driver import setup_source
+from src.text_driver import setup_source
 
 if __name__ == '__main__':
     # передать в лексический анализатор

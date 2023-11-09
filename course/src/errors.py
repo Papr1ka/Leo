@@ -1,5 +1,5 @@
 from .constants import Lex, Lexeme, semantic
-from .test_driver import highlight
+from .text_driver import highlight
 
 def lex_error(lex: Lexeme):
     highlight(lex.line, lex.symbol)

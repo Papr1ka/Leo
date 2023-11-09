@@ -1,7 +1,7 @@
 from src.constants import BASE_SEPARATORS, KEYWORDS, Lex, Lexeme, States
 from src.errors import lex_error
 from src.lexer.handlers import HandlerFactory
-from src.test_driver import get_source
+from src.text_driver import get_source
 
 """
 Приблизительная оценка:
