@@ -1,3 +1,5 @@
+import os
+
 _source = ""
 _lines = []
 _is_set = False
@@ -6,7 +8,7 @@ _filename = "Интерактивный"
 
 def read_file(filename: str) -> str:
     global _lines
-    with open(filename) as file:
+    with open(os.path.abspath(os.path.relpath(filename))) as file:
         _lines = file.readlines()
     if not _lines:
         _lines = [""]

@@ -39,67 +39,67 @@ a!b\n
 
 class Lexer():
     # строка для разбора
-    source: str
+    __source: str
 
     # текущий номер символа
-    index: int
+    __index: int
 
     # текущее состояние
-    state: States
+    __state: States
 
     # класс, возвращающий нам обёртку нужного генератора в зависимости от состояния,
     # следит за тем, чтобы после состояний START и ER генератор был пересоздан
-    factory: HandlerFactory
+    __factory: HandlerFactory
 
     # буфер для лексемы
-    buffer: str
+    __buffer: str
 
     # номер разбираемой строки
-    line: int
+    __line: int
 
     # номер начального символа разбираемой лексемы
-    symbol: int
+    __symbol: int
 
     # сообщение об ошибке последней нераспознанной лексемы
-    error_message: str
+    __error_message: str
 
     def __init__(self):
-        self.source = get_source()
-        self.index = 0
-        self.state = States.START
-        self.factory = HandlerFactory()
-        self.buffer = ""
-        self.line = 1
-        self.symbol = 1
-        self.error_message = ""
+        self.__source = get_source()
+        self.__index = 0
+        self.__state = States.START
+        self.__factory = HandlerFactory()
+        self.__buffer = ""
+        self.__line = 1
+        self.__symbol = 1
+        self.__error_message = ""
 
-    def get_char(self):
+    def __get_char(self):
         """
         Метод возвращает следующий символ строки
         Если символов не осталось, выбрасывается StopIteration
         """
-        if self.index >= len(self.source):
+        if self.__index >= len(self.__source):
             raise StopIteration
-        char = self.source[self.index]
-        self.index += 1
+        char = self.__source[self.__index]
+        self.__index += 1
         return char
 
-    def unget_char(self):
+    def __unget_char(self):
         """
         Метод декрементирует указатель на символ строки
         """
-        if self.index > 0:
-            self.index -= 1
+        if self.__index > 0:
+            self.__index -= 1
 
-    def give_lex(self, lex: Lex):
+    def __give_lex(self, lex: Lex):
         """
         Метод возвращает кортеж из всех известных параметрах о лексеме
         Все возвращаемые анализатором лексемы проходят через эту функцию
         """
-        self.unget_char()
+        self.__unget_char()
         if lex == Lex.UNRESOLVED:
-            lex_error(Lexeme(lex, self.buffer, self.line, self.symbol, self.error_message))
-        return Lexeme(lex, self.buffer, self.line, self.symbol, "")
+            lex_error(Lexeme(lex, self.__buffer, self.__line, self.__symbol, self.__error_message))
+        return Lexeme(lex, self.__buffer, self.__line, self.__symbol, "")
 
     def get_lex(self):
         """
@@ -109,18 +109,18 @@ class Lexer():
 
         while True:
             try:
-                char = self.get_char()
+                char = self.__get_char()
             except StopIteration:
-                if self.state == States.SEPARATOR_COMMENT:
-                    self.error_message = "Комментарий должен быть закрыт"
-                    yield self.give_lex(Lex.UNRESOLVED)
-                self.buffer = ""
-                yield self.give_lex(Lex.EOF)
+                if self.__state == States.SEPARATOR_COMMENT:
+                    self.__error_message = "Комментарий должен быть закрыт"
+                    yield self.__give_lex(Lex.UNRESOLVED)
+                self.__buffer = ""
+                yield self.__give_lex(Lex.EOF)
                 return
 
             lex: Lex = None
             # генератор, который будет заниматься разбором следующего символа, выбирается в зависимости от состояния
-            handler = self.factory.get_handler(self.state)
+            handler = self.__factory.get_handler(self.__state)
 
             # новое состояние, в которое нам следует перейти
             new_state = handler.send(char)
@@ -131,45 +131,45 @@ class Lexer():
 
             # если получили сообщение об ошибке и состояние ошибки
             if isinstance(new_state, list):
-                self.error_message, new_state = new_state
+                self.__error_message, new_state = new_state
 
             # если закончился комментарий
             if new_state == States.STATE_NULL:
                 new_state = States.START
-                self.buffer = ""
+                self.__buffer = ""
 
             # выдаём распознанную лексему
             elif lex is not None:
                 if lex == Lex.IDENTIFIER:
-                    keyword = KEYWORDS.get(self.buffer)
+                    keyword = KEYWORDS.get(self.__buffer)
                     if keyword is None:
-                        yield self.give_lex(lex)
+                        yield self.__give_lex(lex)
                     else:
-                        yield self.give_lex(keyword)
+                        yield self.__give_lex(keyword)
                 else:
-                    yield self.give_lex(lex)
+                    yield self.__give_lex(lex)
 
             # накопление буфера (в случае если lex не None накопление не нужно, так лексема уже была выдана во вне)
             # если lex не None, в буфер попадёт `мусор`, который собьёт счётчик символа в строке (symbol)
             if char not in BASE_SEPARATORS and lex is None:
-                self.buffer += char
+                self.__buffer += char
 
             if lex is not None:
                 # если была распознана лексема
 
-                self.symbol += len(self.buffer)
-                self.buffer = ""
+                self.__symbol += len(self.__buffer)
+                self.__buffer = ""
 
-            self.state = new_state
+            self.__state = new_state
 
             # подсчёт номера линии и символа в строке
             if char in BASE_SEPARATORS:
                 if lex is None:
                     if char == "\n":
-                        self.line += 1
-                        self.symbol = 1
+                        self.__line += 1
+                        self.__symbol = 1
                     else:
-                        self.symbol += 1
+                        self.__symbol += 1
 
                 if new_state == States.ER:
                     """
@@ -182,7 +182,7 @@ class Lexer():
                     чтобы строка
                     '123e 10\n' была распознана как ошибочная лексема и лексема десятичного числа
                     """
-                    self.symbol += len(self.buffer)
-                    yield self.give_lex(Lex.UNRESOLVED)
-                    self.buffer = ""
-                    self.state = States.START
+                    self.__symbol += len(self.__buffer)
+                    yield self.__give_lex(Lex.UNRESOLVED)
+                    self.__buffer = ""
+                    self.__state = States.START

@@ -17,9 +17,9 @@ class Parser:
 
     def __init__(self, lexer: Lexer):
         self.lexer = iter(lexer.get_lex())
-        self.lexeme = self.new_lex()
+        self.lexeme = self.__new_lex()
 
-    def new_lex(self):
+    def __new_lex(self):
         try:
             self.lexeme = next(self.lexer)
         except StopIteration:
@@ -27,21 +27,18 @@ class Parser:
         else:
             return self.lexeme
 
-    def get_lex(self):
+    def __get_lex(self):
         return self.lexeme
 
-    def skip_lex(self, lex: Lex):
+    def __skip_lex(self, lex: Lex):
         if self.lexeme.lex == lex:
-            self.new_lex()
+            self.__new_lex()
         else:
             expected(lex, self.lexeme)
 
     def parse(self) -> ASTNode:
-        ast = self.program_parser()
+        ast = self.__program_parser()
         return ast
-        # while ast != None:
-        #     self.print(ast)
-        #     ast = ast.next_node
 
     def print(self, node: ASTNode):
         if isinstance(node, ASTDeclaration):
@@ -110,81 +107,81 @@ class Parser:
             print("End else Branch")
             print("End if", end="\n\n")
 
-    def identifier_declaration(self, t_type: Types, identifier: Lexeme):
+    def __identifier_declaration(self, t_type: Types, identifier: Lexeme):
         new_name(t_type, identifier)
 
-    def description_parser(self) -> ASTNode:
+    def __description_parser(self) -> ASTNode:
         if self.lexeme.lex not in (Lex.KEYWORD_INT, Lex.KEYWORD_FLOAT, Lex.KEYWORD_BOOL):
             expected_msg("Тип", self.lexeme)
 
         identifier_type = get_type_number_from_lex(self.lexeme.lex)
-        self.new_lex()
+        self.__new_lex()
         if self.lexeme.lex != Lex.IDENTIFIER:
             expected(Lex.IDENTIFIER, self.lexeme)
 
         identifier = self.lexeme
-        self.identifier_declaration(identifier_type, identifier)
-        self.new_lex()
+        self.__identifier_declaration(identifier_type, identifier)
+        self.__new_lex()
 
         head = ASTVar(identifier_type, identifier.value)
         tail = head
 
         while self.lexeme.lex == Lex.SEPARATOR_COMMA:
-            self.new_lex()
+            self.__new_lex()
             if self.lexeme.lex != Lex.IDENTIFIER:
                 expected(Lex.IDENTIFIER, self.lexeme)
 
-            self.identifier_declaration(identifier_type, self.lexeme)
+            self.__identifier_declaration(identifier_type, self.lexeme)
             tail.next_node = ASTVar(identifier_type, self.lexeme.value)
             tail = tail.next_node
-            self.new_lex()
+            self.__new_lex()
 
         return ASTDeclaration(head)
 
-    def operator_combine_parser(self) -> Tuple[ASTNode, ASTNode]:
-        self.skip_lex(Lex.KEYWORD_BEGIN)
-        h_head, h_tail = self.operator_parser()
+    def __operator_combine_parser(self) -> Tuple[ASTNode, ASTNode]:
+        self.__skip_lex(Lex.KEYWORD_BEGIN)
+        h_head, h_tail = self.__operator_parser()
         tail = h_tail
         while self.lexeme.lex == Lex.SEPARATOR_SEMICOLON:
-            self.new_lex()
+            self.__new_lex()
 
-            t_head, t_tail = self.operator_parser()
+            t_head, t_tail = self.__operator_parser()
             tail.next_node = t_head
 
             tail = t_tail
 
-        self.skip_lex(Lex.KEYWORD_END)
+        self.__skip_lex(Lex.KEYWORD_END)
         return h_head, tail
 
-    def identifier_assignment(self, identifier: Lexeme):
+    def __identifier_assignment(self, identifier: Lexeme):
         find_name(identifier.value).is_assigned = True
 
-    def factor_parser(self) -> ASTTyped:
+    def __factor_parser(self) -> ASTTyped:
         if self.lexeme.lex in (Lex.IDENTIFIER, Lex.NUMBER_BIN, Lex.NUMBER_OCT,
                                Lex.NUMBER_DEC, Lex.NUMBER_HEX, Lex.NUMBER_FRACTIONAL,
                                Lex.KEYWORD_TRUE, Lex.KEYWORD_FALSE, Lex.SEPARATOR_NOT,
                                Lex.SEPARATOR_LEFT_BRACKET):
             if self.lexeme.lex == Lex.SEPARATOR_NOT:
-                self.new_lex()
+                self.__new_lex()
                 lex_exp_start = self.lexeme
-                node = self.factor_parser()
+                node = self.__factor_parser()
                 if node.t_type != Types.bool:
                     ctx_error("Унарная операция поддерживается только для типа bool", lex_exp_start)
 
-                self.new_lex()
+                self.__new_lex()
 
                 node = ASTUOperation(node)
 
                 return node
 
             elif self.lexeme.lex == Lex.SEPARATOR_LEFT_BRACKET:
-                self.new_lex()
-                node = self.expression_parser()
-                self.skip_lex(Lex.SEPARATOR_RIGHT_BRACKET)
+                self.__new_lex()
+                node = self.__expression_parser()
+                self.__skip_lex(Lex.SEPARATOR_RIGHT_BRACKET)
                 return node
             else:
                 factor = self.lexeme
-                self.new_lex()
+                self.__new_lex()
                 if factor.lex in (Lex.KEYWORD_TRUE, Lex.KEYWORD_FALSE):
                     return ASTConst(Types.bool, Boolean.from_string(factor.value))
                 elif factor.lex == Lex.NUMBER_FRACTIONAL:
@@ -199,13 +196,13 @@ class Parser:
         else:
             expected_msg("Выражение", self.lexeme)
 
-    def multiplication_parser(self) -> ASTTyped:
-        left_node = self.factor_parser()
+    def __multiplication_parser(self) -> ASTTyped:
+        left_node = self.__factor_parser()
         node = left_node
         while self.lexeme.lex in (Lex.SEPARATOR_MULTIPLICATION, Lex.SEPARATOR_DIVISION, Lex.SEPARATOR_AND):
             operation = self.lexeme
-            self.new_lex()
-            right_node = self.factor_parser()
+            self.__new_lex()
+            right_node = self.__factor_parser()
             if (
                     left_node.t_type == Types.bool or right_node.t_type == Types.bool) and operation.lex != Lex.SEPARATOR_AND:
                 ctx_error("Неподдерживаемая операция для типа bool, возможно вы имели ввиду '&&'", operation)
@@ -215,13 +212,13 @@ class Parser:
             node = ASTBinOperation(node, right_node, get_bin_operation_from_lex(operation.lex))
         return node
 
-    def summa_parser(self) -> ASTTyped:
-        left_node = self.multiplication_parser()
+    def __summa_parser(self) -> ASTTyped:
+        left_node = self.__multiplication_parser()
         node = left_node
         while self.lexeme.lex in (Lex.SEPARATOR_PLUS, Lex.SEPARATOR_MINUS, Lex.SEPARATOR_OR):
             operation = self.lexeme
-            self.new_lex()
-            right_node = self.multiplication_parser()
+            self.__new_lex()
+            right_node = self.__multiplication_parser()
             if (
                     left_node.t_type == Types.bool or right_node.t_type == Types.bool) and operation.lex != Lex.SEPARATOR_OR:
                 ctx_error("Неподдерживаемая операция для типа bool, возможно вы имели ввиду '||'", operation)
@@ -230,14 +227,14 @@ class Parser:
             node = ASTBinOperation(node, right_node, get_bin_operation_from_lex(operation.lex))
         return node
 
-    def expression_parser(self) -> ASTTyped:
-        left_node = self.summa_parser()
+    def __expression_parser(self) -> ASTTyped:
+        left_node = self.__summa_parser()
         node = left_node
         while self.lexeme.lex in (Lex.SEPARATOR_EQUALS, Lex.SEPARATOR_NOT_EQUALS, Lex.SEPARATOR_LT,
                                   Lex.SEPARATOR_LTE, Lex.SEPARATOR_GT, Lex.SEPARATOR_GTE):
             operation = self.lexeme
-            self.new_lex()
-            right_node = self.summa_parser()
+            self.__new_lex()
+            right_node = self.__summa_parser()
             if (left_node.t_type == Types.bool or right_node.t_type == Types.bool) and operation.lex not in (
                     Lex.SEPARATOR_EQUALS, Lex.SEPARATOR_NOT_EQUALS):
                 ctx_error("Неподдерживаемая операция для типа bool", operation)
@@ -246,15 +243,15 @@ class Parser:
             node = ASTBinOperation(node, right_node, get_bin_operation_from_lex(operation.lex))
         return node
 
-    def operator_assignment_parser(self) -> ASTAssignment:
+    def __operator_assignment_parser(self) -> ASTAssignment:
         if self.lexeme.lex != Lex.IDENTIFIER:
             expected(Lex.IDENTIFIER, self.lexeme)
 
         identifier = self.lexeme
-        self.new_lex()
-        self.skip_lex(Lex.SEPARATOR_ASSIGNMENT)
+        self.__new_lex()
+        self.__skip_lex(Lex.SEPARATOR_ASSIGNMENT)
         exp_start_lex = self.lexeme
-        node_expression = self.expression_parser()
+        node_expression = self.__expression_parser()
         identifier_type = find_name(identifier.value)
         if identifier_type is None:
             ctx_error("Переменная не объявлена", identifier)
@@ -262,41 +259,41 @@ class Parser:
             ctx_error(f"Присваиваемое выражение имеет отличный тип от типа переменной, \
 ожидается {identifier_type.t_type.name}", exp_start_lex)
         var = ASTVar(identifier_type.t_type, identifier_type.name)
-        self.identifier_assignment(identifier)
+        self.__identifier_assignment(identifier)
 
         return ASTAssignment(var, node_expression)
 
-    def operator_if_parser(self) -> ASTNode:
-        self.skip_lex(Lex.KEYWORD_IF)
-        self.skip_lex(Lex.SEPARATOR_LEFT_BRACKET)
-        node_condition = self.expression_parser()
-        self.skip_lex(Lex.SEPARATOR_RIGHT_BRACKET)
-        node_branch, _ = self.operator_parser()
+    def __operator_if_parser(self) -> ASTNode:
+        self.__skip_lex(Lex.KEYWORD_IF)
+        self.__skip_lex(Lex.SEPARATOR_LEFT_BRACKET)
+        node_condition = self.__expression_parser()
+        self.__skip_lex(Lex.SEPARATOR_RIGHT_BRACKET)
+        node_branch, _ = self.__operator_parser()
 
         if self.lexeme.lex == Lex.KEYWORD_ELSE:
-            self.new_lex()
-            node_else_branch, _ = self.operator_parser()
+            self.__new_lex()
+            node_else_branch, _ = self.__operator_parser()
 
             return ASTIf(node_condition, node_branch, else_branch=node_else_branch)
 
         return ASTIf(node_condition, node_branch)
 
-    def operator_for_parser(self) -> Tuple[ASTNode, ASTNode]:
-        self.skip_lex(Lex.KEYWORD_FOR)
+    def __operator_for_parser(self) -> Tuple[ASTNode, ASTNode]:
+        self.__skip_lex(Lex.KEYWORD_FOR)
         lex_assignment_start = self.lexeme
-        node_assignment = self.operator_assignment_parser()
+        node_assignment = self.__operator_assignment_parser()
         if node_assignment.var.t_type != Types.int:
             ctx_error("Переменная цикла for должна быть типа int, иначе используйте while", lex_assignment_start)
-        self.skip_lex(Lex.KEYWORD_TO)
+        self.__skip_lex(Lex.KEYWORD_TO)
         lex_expression_start = self.lexeme
-        node_expression = self.expression_parser()
+        node_expression = self.__expression_parser()
         if node_expression.t_type != Types.int:
             ctx_error("Условие цикла for должно быть типа int", lex_expression_start)
 
         if self.lexeme.lex == Lex.KEYWORD_STEP:
-            self.new_lex()
+            self.__new_lex()
             lex_expression_start = self.lexeme
-            node_step = self.expression_parser()
+            node_step = self.__expression_parser()
 
             if node_step.t_type != Types.int:
                 ctx_error(f"Несоответствие типов, выражение в step должно быть типа int \
@@ -304,25 +301,25 @@ class Parser:
         else:
             node_step = ASTConst(Types.int, Integer(1))
 
-        node_body_start, _ = self.operator_parser()
+        node_body_start, _ = self.__operator_parser()
 
-        self.skip_lex(Lex.KEYWORD_NEXT)
+        self.__skip_lex(Lex.KEYWORD_NEXT)
 
         node_loop = ASTForLoop(node_assignment.var, node_expression, node_body_start, node_step)
 
         node_assignment.next_node = node_loop
         return node_assignment, node_loop
 
-    def operator_while_parser(self) -> ASTNode:
-        self.skip_lex(Lex.KEYWORD_WHILE)
-        self.skip_lex(Lex.SEPARATOR_LEFT_BRACKET)
-        node_condition = self.expression_parser()
-        self.skip_lex(Lex.SEPARATOR_RIGHT_BRACKET)
-        node_body, _ = self.operator_parser()
+    def __operator_while_parser(self) -> ASTNode:
+        self.__skip_lex(Lex.KEYWORD_WHILE)
+        self.__skip_lex(Lex.SEPARATOR_LEFT_BRACKET)
+        node_condition = self.__expression_parser()
+        self.__skip_lex(Lex.SEPARATOR_RIGHT_BRACKET)
+        node_body, _ = self.__operator_parser()
         return ASTLoop(node_condition, node_body)
 
-    def operator_readln_parser(self) -> ASTNode:
-        self.skip_lex(Lex.KEYWORD_READLN)
+    def __operator_readln_parser(self) -> ASTNode:
+        self.__skip_lex(Lex.KEYWORD_READLN)
         if self.lexeme.lex != Lex.IDENTIFIER:
             expected(Lex.IDENTIFIER, self.lexeme)
 
@@ -330,94 +327,93 @@ class Parser:
         var = find_name(identifier.value)
         if var is None:
             ctx_error("Переменная не объявлена", identifier)
-        self.identifier_assignment(identifier)
-        self.new_lex()
+        self.__identifier_assignment(identifier)
+        self.__new_lex()
 
         head = ASTVar(var.t_type, var.name)
         node = head
 
         while self.lexeme.lex == Lex.SEPARATOR_COMMA:
-            self.new_lex()
+            self.__new_lex()
             if self.lexeme.lex != Lex.IDENTIFIER:
                 expected(Lex.IDENTIFIER, self.lexeme)
             identifier = self.lexeme
             var = find_name(identifier.value)
             if var is None:
                 ctx_error("Переменная не объявлена", identifier)
-            self.identifier_assignment(identifier)
+            self.__identifier_assignment(identifier)
             node.next_node = ASTVar(var.t_type, var.name)
             node = node.next_node
-            self.new_lex()
+            self.__new_lex()
 
         return ASTIn(head)
 
-    def operator_writeln_parser(self) -> ASTNode:
-        self.skip_lex(Lex.KEYWORD_WRITELN)
-        head = self.expression_parser()
+    def __operator_writeln_parser(self) -> ASTNode:
+        self.__skip_lex(Lex.KEYWORD_WRITELN)
+        head = self.__expression_parser()
         node = head
 
         while self.lexeme.lex == Lex.SEPARATOR_COMMA:
-            self.new_lex()
-            node.next_node = self.expression_parser()
+            self.__new_lex()
+            node.next_node = self.__expression_parser()
             node = node.next_node
         return ASTOut(head)
 
-    def operator_parser(self) -> Tuple[ASTNode, ASTNode]:
+    def __operator_parser(self) -> Tuple[ASTNode, ASTNode]:
         node = None
         if self.lexeme.lex == Lex.KEYWORD_BEGIN:
-            return self.operator_combine_parser()
+            return self.__operator_combine_parser()
         elif self.lexeme.lex == Lex.IDENTIFIER:
-            node = self.operator_assignment_parser()
+            node = self.__operator_assignment_parser()
         elif self.lexeme.lex == Lex.KEYWORD_IF:
-            node = self.operator_if_parser()
+            node = self.__operator_if_parser()
         elif self.lexeme.lex == Lex.KEYWORD_FOR:
-            return self.operator_for_parser()
+            return self.__operator_for_parser()
         elif self.lexeme.lex == Lex.KEYWORD_WHILE:
-            node = self.operator_while_parser()
+            node = self.__operator_while_parser()
         elif self.lexeme.lex == Lex.KEYWORD_READLN:
-            node = self.operator_readln_parser()
+            node = self.__operator_readln_parser()
         elif self.lexeme.lex == Lex.KEYWORD_WRITELN:
-            node = self.operator_writeln_parser()
+            node = self.__operator_writeln_parser()
         else:
             expected_msg("Оператор", self.lexeme)
         return node, node
 
-    def description_or_operator_seq(self) -> Tuple[ASTNode, ASTNode]:
+    def __description_or_operator_seq(self) -> Tuple[ASTNode, ASTNode]:
         head = None
         tail = None
         while self.lexeme.lex in (Lex.KEYWORD_INT, Lex.KEYWORD_FLOAT, Lex.KEYWORD_BOOL,
                                   Lex.KEYWORD_BEGIN, Lex.IDENTIFIER, Lex.KEYWORD_IF,
                                   Lex.KEYWORD_FOR, Lex.KEYWORD_WHILE, Lex.KEYWORD_READLN,
                                   Lex.KEYWORD_WRITELN):
-            h_head, h_tail = self.description_or_operator_parser()
+            h_head, h_tail = self.__description_or_operator_parser()
             if head is None:
                 head = h_head
                 tail = h_tail
             else:
                 tail.next_node = h_head
                 tail = h_tail
-            self.skip_lex(Lex.SEPARATOR_SEMICOLON)
+            self.__skip_lex(Lex.SEPARATOR_SEMICOLON)
         return head, tail
 
-    def description_or_operator_parser(self) -> Tuple[ASTNode, ASTNode]:
+    def __description_or_operator_parser(self) -> Tuple[ASTNode, ASTNode]:
         if self.lexeme.lex in (Lex.KEYWORD_INT, Lex.KEYWORD_FLOAT, Lex.KEYWORD_BOOL):
-            node = self.description_parser()
+            node = self.__description_parser()
             return node, node
         else:
-            return self.operator_parser()
+            return self.__operator_parser()
 
-    def program_parser(self) -> ASTNode:
-        self.skip_lex(Lex.SEPARATOR_LEFT_FIGURE_BRACKET)
+    def __program_parser(self) -> ASTNode:
+        self.__skip_lex(Lex.SEPARATOR_LEFT_FIGURE_BRACKET)
 
-        h_head, h_tail = self.description_or_operator_parser()
-        self.skip_lex(Lex.SEPARATOR_SEMICOLON)
+        h_head, h_tail = self.__description_or_operator_parser()
+        self.__skip_lex(Lex.SEPARATOR_SEMICOLON)
 
-        t_head, t_tail = self.description_or_operator_seq()
+        t_head, t_tail = self.__description_or_operator_seq()
         if t_head is not None:
             h_tail.next_node = t_head
 
-        self.skip_lex(Lex.SEPARATOR_RIGHT_FIGURE_BRACKET)
-        self.skip_lex(Lex.EOF)
+        self.__skip_lex(Lex.SEPARATOR_RIGHT_FIGURE_BRACKET)
+        self.__skip_lex(Lex.EOF)
 
-        print("Синтаксический и семантический анализ закончен")
         return h_head

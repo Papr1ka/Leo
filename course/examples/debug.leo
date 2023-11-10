@@ -1,3 +1,6 @@
 {
-    writeln (1 * 2 + 3) * 2 + 3 / 2;
+    int i;
+    for i := 1 to 10 step 3
+    writeln i
+    next;
 }
