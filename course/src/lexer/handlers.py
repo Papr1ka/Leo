@@ -142,7 +142,7 @@ def state_separator_lt_handler():
             yield Lex.SEPARATOR_LTE, States.START
 
 
-def state_separatpr_gt_handler():
+def state_separator_gt_handler():
     state = 0
     while True:
         char: str = yield
@@ -518,7 +518,7 @@ HANDLERS = {
     States.SEPARATOR_NOT: state_separator_not_handler,
     States.SEPARATOR_EQUALS: state_separator_equals_handler,
     States.SEPARATOR_LT: state_separator_lt_handler,
-    States.SEPARATOR_GT: state_separatpr_gt_handler,
+    States.SEPARATOR_GT: state_separator_gt_handler,
     States.SEPARATOR_OR: state_separator_or_handler,
     States.SEPARATOR_AND: state_separator_and_handler,
     States.SEPARATOR_ASSIGNMENT: state_separator_assignment_handler,

@@ -49,7 +49,8 @@ class States(Enum):
 BASE_SEPARATORS = (
     " ",
     "\n",
-    "\t"
+    "\t",
+    "@",
 )
 
 # Границы лексем
@@ -191,6 +192,7 @@ semantic = {
     Lex.SEPARATOR_RIGHT_FIGURE_BRACKET: "}",
     Lex.SEPARATOR_SEMICOLON: ";",
     Lex.SEPARATOR_COMMA: ",",
+    Lex.EOF: "Конец файла"
 }
 
 

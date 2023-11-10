@@ -114,6 +114,8 @@ class Lexer():
                 if self.state == States.SEPARATOR_COMMENT:
                     self.error_message = "Комментарий должен быть закрыт"
                     yield self.give_lex(Lex.UNRESOLVED)
+                self.buffer = ""
+                yield self.give_lex(Lex.EOF)
                 return
 
             lex: Lex = None

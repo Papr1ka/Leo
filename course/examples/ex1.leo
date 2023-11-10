@@ -5,10 +5,6 @@
     123
     */
     int primeNumberCount, number, i, j;
-    
-    begin
-    end
-    begin end
 
     readln primeNumberCount;
     number := 0;

@@ -197,7 +197,7 @@ class Parser:
                     return ASTVar(t_item.t_type, factor.value)
                 return ASTConst(Types.int, Integer.from_string(factor.value))
         else:
-            expected_msg("Множитель", self.lexeme)
+            expected_msg("Выражение", self.lexeme)
 
     def multiplication_parser(self) -> ASTTyped:
         left_node = self.factor_parser()
@@ -417,6 +417,7 @@ class Parser:
             h_tail.next_node = t_head
 
         self.skip_lex(Lex.SEPARATOR_RIGHT_FIGURE_BRACKET)
+        self.skip_lex(Lex.EOF)
 
         print("Синтаксический и семантический анализ закончен")
         return h_head

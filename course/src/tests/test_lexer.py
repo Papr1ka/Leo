@@ -1,19 +1,19 @@
 from unittest import TestCase
 from ..lexer import Lexer
 from ..constants import Lex
+from src.text_driver import setup_source
+
 
 class TestLexer(TestCase):
 
     def test_lex_numbers(self):
-
         # import os
         # print(os.path.abspath(os.path.relpath(os.curdir)))
 
         # Файл с заранее известными числами и заранее известным порядком этих чисел
-        with open("./src/tests/test_numbers.txt") as file:
-            data = "".join(file.readlines())
+        setup_source("./src/tests/test_numbers.txt")
 
-        lexer = Lexer(data).get_lex()
+        lexer = Lexer().get_lex()
         g = iter(lexer)
 
         # print(next(lexer.get_lex())[0:2])
@@ -90,7 +90,6 @@ class TestLexer(TestCase):
         self.assertEqual(next(g)[0:2], (Lex.UNRESOLVED, '123.e.'))
         self.assertEqual(next(g)[0:2], (Lex.UNRESOLVED, '123.e.10'))
 
-
         self.assertEqual(next(g)[0:2], (Lex.NUMBER_DEC, '123'))
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_PLUS, '+'))
         self.assertEqual(next(g)[0:2], (Lex.IDENTIFIER, 'e10'))
@@ -123,10 +122,9 @@ class TestLexer(TestCase):
         self.assertEqual(next(g)[0:2], (Lex.NUMBER_HEX, '123EBBD0H'))
 
     def test_lex_separators(self):
-        with open("./src/tests/test_separators.txt") as file:
-            data = "".join(file.readlines())
+        setup_source("./src/tests/test_separators.txt")
 
-        lexer = Lexer(data).get_lex()
+        lexer = Lexer().get_lex()
         g = iter(lexer)
 
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_LEFT_BRACKET, '('))
@@ -365,11 +363,11 @@ class TestLexer(TestCase):
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_EQUALS, "=="))
 
     def test_line_symbols(self):
-        with open("./src/tests/test_line_symbols.txt") as file:
-            data = "".join(file.readlines())
+        setup_source("./src/tests/test_line_symbols.txt")
 
-        lexer = Lexer(data).get_lex()
+        lexer = Lexer().get_lex()
         g = iter(lexer)
+
         self.assertEqual(next(g)[2:4], (1, 1))
 
         self.assertEqual(next(g)[2:4], (2, 5))
@@ -467,10 +465,9 @@ class TestLexer(TestCase):
         self.assertEqual(next(g)[2:4], (36, 1))
 
     def test_lex_identifiers_separators(self):
-        with open("./src/tests/test_separators_context.txt") as file:
-            data = "".join(file.readlines())
+        setup_source("./src/tests/test_separators_context.txt")
 
-        lexer = Lexer(data).get_lex()
+        lexer = Lexer().get_lex()
         g = iter(lexer)
 
         self.assertEqual(next(g)[0:2], (Lex.IDENTIFIER, "I"))
@@ -545,10 +542,9 @@ class TestLexer(TestCase):
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_RIGHT_FIGURE_BRACKET, "}"))
 
     def test_lex_keywords(self):
-        with open("./src/tests/test_keywords.txt") as file:
-            data = "".join(file.readlines())
+        setup_source("./src/tests/test_keywords.txt")
 
-        lexer = Lexer(data).get_lex()
+        lexer = Lexer().get_lex()
         g = iter(lexer)
 
         self.assertEqual(next(g)[0:2], (Lex.KEYWORD_BEGIN, "begin"))
@@ -568,7 +564,6 @@ class TestLexer(TestCase):
         self.assertEqual(next(g)[0:2], (Lex.KEYWORD_WHILE, "while"))
         self.assertEqual(next(g)[0:2], (Lex.KEYWORD_WRITELN, "writeln"))
 
-
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_COMMA, ","))
         self.assertEqual(next(g)[0:2], (Lex.KEYWORD_BEGIN, "begin"))
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_COMMA, ","))
@@ -617,9 +612,6 @@ class TestLexer(TestCase):
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_COMMA, ","))
         self.assertEqual(next(g)[0:2], (Lex.KEYWORD_WRITELN, "writeln"))
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_COMMA, ","))
-
-
-
 
 
 if __name__ == "__main__":

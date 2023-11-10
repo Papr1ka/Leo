@@ -1,10 +1,10 @@
 from src.interpretor.interpretor import run
 from src.lexer import Lexer
-from src.parser.syntax_parser import Parser
+from src.parser.parser import Parser
 from src.text_driver import setup_source
 
 if __name__ == '__main__':
-    setup_source("./examples/leonid.leo")
+    setup_source("./examples/ex1.leo")
     lexer = Lexer()
 
     parser = Parser(lexer)
