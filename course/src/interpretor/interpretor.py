@@ -54,6 +54,8 @@ def exec_expression(ast: ASTTyped) -> Union[Integer, Float, Boolean]:
             return exec_expression(ast.left).eq(exec_expression(ast.right))
         elif ast.operation == BinOperations.neq:
             return exec_expression(ast.left).neq(exec_expression(ast.right))
+        elif ast.operation == BinOperations.mod:
+            return exec_expression(ast.left).mod(exec_expression(ast.right))
         else:
             raise ValueError("Неопределённая операция")
 
@@ -93,6 +95,7 @@ def exec_operator(ast: ASTNode):
 
     elif ast.a_type == ASTType.ForLoop:
         ast: ASTForLoop
+        exec_operator(ast.assignment)
         condition: Boolean = exec_expression(ast.condition)
         step: ASTConst = ASTConst(ast.step.t_type, exec_expression(ast.step))
         while condition.value:
@@ -102,7 +105,7 @@ def exec_operator(ast: ASTNode):
                 node = node.next_node
             exec_operator(
                 ASTAssignment(
-                    ast.var, ASTBinOperation(ast.var, step, BinOperations.sum)
+                    ast.assignment.var, ASTBinOperation(ast.assignment.var, step, BinOperations.sum)
                 )
             )
             condition = exec_expression(ast.condition)

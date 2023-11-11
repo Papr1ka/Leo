@@ -1,3 +1,7 @@
+"""
+Модуль синтезации программы на c++ из абстрактного дерева
+"""
+
 from src.tree import *
 
 type_enum_to_type_str_table = {
@@ -13,7 +17,7 @@ def translate(ast: ASTNode):
     while ast is not None:
         r += translate_operator(ast)
         ast = ast.next_node
-    r += "\n\treturn 0;\n}\n"
+    r += "\treturn 0;\n}\n"
     return r
 
 
@@ -54,6 +58,8 @@ def translate_expression(ast: ASTTyped) -> str:
             return "(" + translate_expression(ast.left) + " == " + translate_expression(ast.right) + ")"
         elif ast.operation == BinOperations.neq:
             return "(" + translate_expression(ast.left) + " != " + translate_expression(ast.right) + ")"
+        elif ast.operation == BinOperations.mod:
+            return "(" + translate_expression(ast.left) + " % " + translate_expression(ast.right) + ")"
         else:
             raise ValueError("Неопределённая операция")
 
@@ -103,14 +109,17 @@ def translate_operator(ast: ASTNode, tabs: int = 1):
         while node is not None:
             r += translate_operator(node, tabs + 1)
             node = node.next_node
-        r += "\n" + "\t" * tabs + "}\n"
+        r += "\t" * tabs + "}\n"
         return r
 
     elif ast.a_type == ASTType.ForLoop:
         ast: ASTForLoop
+        assignment = type_enum_to_type_str_table.get(
+            Types.int) + " " + ast.assignment.var.name + " = " + translate_expression(ast.assignment.value)
         condition = translate_expression(ast.condition)
         step = translate_expression(ast.step)
-        r = "\t" * tabs + "for (; " + condition + "; " + ast.var.name + " = " + ast.var.name + " + " + step + ")" + "\n" + "\t" * tabs + "{\n"
+        r = ("\t" * tabs + "for (" + assignment + "; " + condition + "; " + ast.assignment.var.name +
+             " += " + step + ")" + "\n" + "\t" * tabs + "{\n")
         node = ast.body
         while node is not None:
             r += translate_operator(node, tabs + 1)
@@ -138,4 +147,3 @@ def translate_operator(ast: ASTNode, tabs: int = 1):
         return r
     else:
         raise ValueError("Оператор не определён")
-
