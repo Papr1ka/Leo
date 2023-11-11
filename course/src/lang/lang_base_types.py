@@ -19,19 +19,6 @@ class BaseType(ABC):
     def eq(self, other):
         return Boolean(self.value.__eq__(other.value))
 
-    def lt(self, other):
-        tmp = self.value.__lt__(other.value)
-        return Boolean(self.value.__lt__(other.value))
-
-    def lte(self, other):
-        return Boolean(self.value.__le__(other.value))
-
-    def gt(self, other):
-        return Boolean(self.value.__gt__(other.value))
-
-    def gte(self, other):
-        return Boolean(self.value.__ge__(other.value))
-
     def or_(self, other):
         return Boolean(bool(self.value) or bool(other.value))
 
@@ -63,6 +50,19 @@ class Number(BaseType):
     def div(self, other):
         pass
 
+    def lt(self, other):
+        tmp = self.value.__lt__(other.value)
+        return Boolean(self.value.__lt__(other.value))
+
+    def lte(self, other):
+        return Boolean(self.value.__le__(other.value))
+
+    def gt(self, other):
+        return Boolean(self.value.__gt__(other.value))
+
+    def gte(self, other):
+        return Boolean(self.value.__ge__(other.value))
+
 
 class Integer(Number):
     @staticmethod
@@ -93,6 +93,9 @@ class Integer(Number):
 
     def div(self, other):
         return Integer(self.value // other.value)
+
+    def mod(self, other):
+        return Integer(self.value % other.value)
 
 
 class Float(Number):
@@ -184,6 +187,9 @@ class BinOperations(Enum):
     gte = 9  # >=
     lt = 10  # <
     lte = 11  # <=
+
+    # Оптимизация дерева
+    mod = 12  # %
 
 
 RELATION_OPERATORS = [
