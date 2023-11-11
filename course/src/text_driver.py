@@ -1,4 +1,6 @@
 import os
+import pathlib
+from typing import Union
 
 _source = ""
 _lines = []
@@ -6,7 +8,7 @@ _is_set = False
 _filename = "Интерактивный"
 
 
-def read_file(filename: str) -> str:
+def read_file(filename: pathlib.Path) -> str:
     global _lines
     with open(os.path.abspath(os.path.relpath(filename))) as file:
         _lines = file.readlines()
@@ -14,12 +16,6 @@ def read_file(filename: str) -> str:
         _lines = [""]
     stream = "".join(_lines) + "@"
     return stream
-
-
-def read_string(string: str):
-    global _lines
-    _lines = string.split("\n")
-    return string + "@"
 
 
 def highlight(line: int, symbol: int):
@@ -34,13 +30,16 @@ def highlight(line: int, symbol: int):
         print("^")
 
 
-def setup_source(filename_or_source: str):
+def setup_source(filename: Union[pathlib.Path, str]):
     global _source, _is_set, _filename
-    if filename_or_source.endswith(".leo"):
-        _source = read_file(filename_or_source)
-        _filename = filename_or_source
+    if isinstance(filename, str):
+        filename = pathlib.Path(filename)
+
+    if filename.name.endswith(".leo"):
+        _source = read_file(filename)
+        _filename = filename.name
     else:
-        _source = read_string(filename_or_source)
+        raise ValueError("Имя файла должно иметь расширение .leo")
     _is_set = True
 
 
