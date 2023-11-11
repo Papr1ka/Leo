@@ -1,14 +1,34 @@
+import argparse
+import pathlib
+
 import src
-import sys
 
 if __name__ == "__main__":
-    if len(sys.argv) <= 1:
-        print("Ошибка, необходимо указать имя файла")
-        exit(4)
+    DESCRIPTION = """Интерпретатор и транслятор языка Leo (.leo) Удачи!"""
 
-    src.setup_source(sys.argv[1])
-    print("Файл", src.get_filename())
+    parser = argparse.ArgumentParser(description=DESCRIPTION)
+    parser.add_argument("target", type=pathlib.Path, help="Имя файла с расширением .leo", metavar="target")
+    parser.add_argument("-t", "--translate", type=str, choices=['py', 'cpp'], default="py",
+                        help="Целевой язык для трансляции, py | cpp")
+    parser.add_argument("-o", "--output", type=str, help="Название выходного файла", metavar="filename")
+    namespace = parser.parse_args()
+    print(namespace)
+
+    src.setup_source(namespace.target)
     lexer = src.Lexer()
     parser = src.Parser(lexer)
     ast = parser.parse()
-    src.run(ast)
+
+    if namespace.output is None:
+        result = src.py_translate(ast)
+        exec(result)
+    else:
+        if namespace.translate == "py":
+            result = src.py_translate(ast)
+        else:
+            result = src.cpp_translate(ast)
+
+        with open(namespace.output, "w") as file:
+            file.writelines(result)
+
+    print("Leo: Успешно")

@@ -2,28 +2,12 @@
 
 int main()
 {
-	int primeNumberCount, number, i, j;
-	std::cin >> primeNumberCount;
-	number = 0;
-	while ((primeNumberCount > 0))
+	double j;
+	for (long long i = 0; (i < 10); i += 1)
 	{
-		number = (number + 1);
-		j = 0;
-		i = 1;
-		for (; (i <= (number + 1)); i = i + 1)
-		{
-			if ((((number / i) * i) == number))
-			{
-				j = (j + 1);
-			}
-		}
-		if ((j == 2))
-		{
-			primeNumberCount = (primeNumberCount - 1);
-			std::cout << number << std::endl;
-		}
-
+		std::cout << i << std::endl;
+		j = 1.0;
+		std::cout << (i + 10) << std::endl;
 	}
-
 	return 0;
 }

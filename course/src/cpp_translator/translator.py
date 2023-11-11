@@ -1,8 +1,8 @@
 from src.tree import *
 
 type_enum_to_type_str_table = {
-    Types.int: "int",
-    Types.float: "float",
+    Types.int: "long long",
+    Types.float: "double",
     Types.bool: "bool"
 }
 

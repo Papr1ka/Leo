@@ -1,31 +1,27 @@
 {
     /*
-    asd
-    asdasd
-    123
+    Поиск первых primeNumberCount простых чисел
     */
-    int primeNumberCount, number, i, j;
+    int primeNumberCount, number, j;
 
-    readln primeNumberCount;
-    number := 0;
+    primeNumberCount := 10;
+    number := 1;
 
     while (primeNumberCount > 0)
     begin
-    number := number + 1;
-    j := 0;
+        number := number + 1;
+        j := 0;
+        for i := 1 to number + 1 step 1
+        begin
+            if (number / i * i == number)
+                j := j + 1
+        end
+        next;
 
-    for i := 1 to number + 1 step 1
-    begin
-
-    if (number / i * i == number) j := j + 1
-
-    end
-    next;
-
-    if (j == 2)
-    begin
-    primeNumberCount := primeNumberCount - 1;
-    writeln number
-    end
+        if (j == 2)
+        begin
+            primeNumberCount := primeNumberCount - 1;
+            writeln number
+        end
     end;
 }

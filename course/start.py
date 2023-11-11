@@ -4,7 +4,7 @@ from src.parser.parser import Parser
 from src.text_driver import setup_source
 
 if __name__ == '__main__':
-    setup_source("./examples/ex1.leo")
+    setup_source("./examples/debug.leo")
     lexer = Lexer()
 
     parser = Parser(lexer)
