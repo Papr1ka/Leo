@@ -5,10 +5,10 @@ from src.errors import ctx_error, expected, expected_msg
 from src.lang import get_type_number_from_lex, Types
 from src.lang.lang_base_types import Boolean, Float, get_bin_operation_from_lex, Integer
 from src.lexer import Lexer
-from src.parser.name_table import find_name, new_name
+from src.parser.name_table import close_scope, find_name, new_name, open_scope
 from src.tree import ASTAssignment, ASTBinOperation, ASTConst, ASTDeclaration, ASTForLoop, ASTIf, ASTIn, ASTLoop, \
     ASTNode, ASTOut, \
-    ASTTyped, ASTUOperation, ASTVar
+    ASTTyped, ASTUOperation, ASTVar, optimize_tree
 
 
 class Parser:
@@ -37,7 +37,10 @@ class Parser:
             expected(lex, self.lexeme)
 
     def parse(self) -> ASTNode:
+        open_scope()
         ast = self.__program_parser()
+        close_scope()
+        optimize_tree(ast)
         return ast
 
     def print(self, node: ASTNode):
@@ -107,8 +110,8 @@ class Parser:
             print("End else Branch")
             print("End if", end="\n\n")
 
-    def __identifier_declaration(self, t_type: Types, identifier: Lexeme):
-        new_name(t_type, identifier)
+    def __identifier_declaration(self, t_type: Types, identifier: Lexeme, readonly=False):
+        new_name(t_type, identifier, readonly=readonly)
 
     def __description_parser(self) -> ASTNode:
         if self.lexeme.lex not in (Lex.KEYWORD_INT, Lex.KEYWORD_FLOAT, Lex.KEYWORD_BOOL):
@@ -168,8 +171,6 @@ class Parser:
                 if node.t_type != Types.bool:
                     ctx_error("Унарная операция поддерживается только для типа bool", lex_exp_start)
 
-                self.__new_lex()
-
                 node = ASTUOperation(node)
 
                 return node
@@ -188,7 +189,9 @@ class Parser:
                     return ASTConst(Types.float, Float.from_string(factor.value))
                 elif factor.lex == Lex.IDENTIFIER:
                     t_item = find_name(factor.value)
-                    if t_item is None or not t_item.is_assigned:
+                    if t_item is None:
+                        ctx_error("Переменная не объявлена в этой области видимости", factor)
+                    elif not t_item.is_assigned:
                         ctx_error("Переменная не инициализированна", factor)
 
                     return ASTVar(t_item.t_type, factor.value)
@@ -203,8 +206,8 @@ class Parser:
             operation = self.lexeme
             self.__new_lex()
             right_node = self.__factor_parser()
-            if (
-                    left_node.t_type == Types.bool or right_node.t_type == Types.bool) and operation.lex != Lex.SEPARATOR_AND:
+            if ((left_node.t_type == Types.bool or right_node.t_type == Types.bool) and
+                    operation.lex != Lex.SEPARATOR_AND):
                 ctx_error("Неподдерживаемая операция для типа bool, возможно вы имели ввиду '&&'", operation)
             elif left_node.t_type != right_node.t_type:
                 ctx_error("Типы операндов не совпадают", operation)
@@ -219,8 +222,8 @@ class Parser:
             operation = self.lexeme
             self.__new_lex()
             right_node = self.__multiplication_parser()
-            if (
-                    left_node.t_type == Types.bool or right_node.t_type == Types.bool) and operation.lex != Lex.SEPARATOR_OR:
+            if ((left_node.t_type == Types.bool or right_node.t_type == Types.bool) and
+                    operation.lex != Lex.SEPARATOR_OR):
                 ctx_error("Неподдерживаемая операция для типа bool, возможно вы имели ввиду '||'", operation)
             elif left_node.t_type != right_node.t_type:
                 ctx_error("Типы операндов не совпадают", operation)
@@ -255,6 +258,8 @@ class Parser:
         identifier_type = find_name(identifier.value)
         if identifier_type is None:
             ctx_error("Переменная не объявлена", identifier)
+        elif identifier_type.readonly:
+            ctx_error(f"Переменная доступна только для чтения", identifier)
         elif identifier_type.t_type != node_expression.t_type:
             ctx_error(f"Присваиваемое выражение имеет отличный тип от типа переменной, \
 ожидается {identifier_type.t_type.name}", exp_start_lex)
@@ -266,7 +271,10 @@ class Parser:
     def __operator_if_parser(self) -> ASTNode:
         self.__skip_lex(Lex.KEYWORD_IF)
         self.__skip_lex(Lex.SEPARATOR_LEFT_BRACKET)
+        lex_condition_start = self.lexeme
         node_condition = self.__expression_parser()
+        if node_condition.t_type != Types.bool:
+            ctx_error("Условие должно быть типа bool", lex_condition_start)
         self.__skip_lex(Lex.SEPARATOR_RIGHT_BRACKET)
         node_branch, _ = self.__operator_parser()
 
@@ -281,9 +289,18 @@ class Parser:
     def __operator_for_parser(self) -> Tuple[ASTNode, ASTNode]:
         self.__skip_lex(Lex.KEYWORD_FOR)
         lex_assignment_start = self.lexeme
+
+        open_scope()
+        identifier_type = Types.int
+        self.__identifier_declaration(identifier_type, lex_assignment_start)
+
         node_assignment = self.__operator_assignment_parser()
         if node_assignment.var.t_type != Types.int:
             ctx_error("Переменная цикла for должна быть типа int, иначе используйте while", lex_assignment_start)
+
+        identifier = find_name(lex_assignment_start.value)
+        identifier.readonly = True
+
         self.__skip_lex(Lex.KEYWORD_TO)
         lex_expression_start = self.lexeme
         node_expression = self.__expression_parser()
@@ -305,15 +322,17 @@ class Parser:
 
         self.__skip_lex(Lex.KEYWORD_NEXT)
 
-        node_loop = ASTForLoop(node_assignment.var, node_expression, node_body_start, node_step)
-
-        node_assignment.next_node = node_loop
-        return node_assignment, node_loop
+        node_loop = ASTForLoop(node_assignment, node_expression, node_body_start, node_step)
+        close_scope()
+        return node_loop, node_loop
 
     def __operator_while_parser(self) -> ASTNode:
         self.__skip_lex(Lex.KEYWORD_WHILE)
         self.__skip_lex(Lex.SEPARATOR_LEFT_BRACKET)
+        lex_condition_start = self.lexeme
         node_condition = self.__expression_parser()
+        if node_condition.t_type != Types.bool:
+            ctx_error("Условие должно быть типа bool", lex_condition_start)
         self.__skip_lex(Lex.SEPARATOR_RIGHT_BRACKET)
         node_body, _ = self.__operator_parser()
         return ASTLoop(node_condition, node_body)
