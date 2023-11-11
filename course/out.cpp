@@ -2,16 +2,14 @@
 
 int main()
 {
-	double j;
+	long long j;
 	for (long long i = 0; (i < 10); i += 1)
 	{
 		std::cout << i << std::endl;
-		j = 1.0;
+		j = i;
 	}
-	for (long long i = 0; (i < 10); i += 1)
-	{
-		std::cout << i << std::endl;
-		j = 1.0;
-	}
+	long long i;
+	i = j;
+	std::cout << i << std::endl;
 	return 0;
 }
