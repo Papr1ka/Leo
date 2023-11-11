@@ -32,7 +32,7 @@ class ASTNode:
 
 class ASTTyped(ASTNode):
     """
-    Типизированный узел, может быть переменной, выражением, константой
+    Типизированный узел, может быть переменной, бинарной или унарной операцией, константой
     """
     t_type: Types
 
@@ -138,15 +138,15 @@ class ASTForLoop(ASTNode):
     Цикл for
     step - подразумевается, что вычисляется один раз и превращается в константу
     """
-    var: ASTVar
-    condition: ASTTyped
+    assignment: ASTAssignment
+    condition: ASTBinOperation
     body: ASTNode
     step: ASTTyped
 
-    def __init__(self, var: ASTVar, expression: ASTTyped, body: ASTNode, step: ASTTyped):
+    def __init__(self, assignment: ASTAssignment, expression: ASTTyped, body: ASTNode, step: ASTTyped):
         super().__init__(ASTType.ForLoop)
-        self.var = var
-        self.condition = ASTBinOperation(var, expression, BinOperations.lte)
+        self.assignment = assignment
+        self.condition = ASTBinOperation(assignment.var, expression, BinOperations.lt)
         self.body = body
         self.step = step
 
