@@ -1,19 +1,12 @@
+from src.interpretor.interpretor import run
 from src.lexer import Lexer
-from src.parser.syntax_parser import SyntaxParser
+from src.parser.parser import Parser
+from src.text_driver import setup_source
 
 if __name__ == '__main__':
-    source = """123 321 number i e"""
+    setup_source("./examples/debug.leo")
+    lexer = Lexer()
 
-    test = """
-можно написать тестовую программу здесь
-"""
-
-    # или считать из файла
-    with open("./examples/ex1") as file:
-        file_contents = "".join(file.readlines())
-
-    # передать в лексический анализатор
-    lexer = Lexer(file_contents)
-
-    parser = SyntaxParser(lexer)
-    parser.parse()
+    parser = Parser(lexer)
+    ast = parser.parse()
+    run(ast)

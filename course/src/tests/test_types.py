@@ -116,43 +116,31 @@ class TypesTest(unittest.TestCase):
 
         self.assertEqual(Integer(10).lt(Integer(11)).value, True)
         self.assertEqual(Float(10.).lt(Float(11.)).value, True)
-        self.assertEqual(Boolean(False).lt(Boolean(True)).value, True)
         self.assertEqual(Integer(10).lt(Integer(10)).value, False)
         self.assertEqual(Float(10.).lt(Float(10.)).value, False)
-        self.assertEqual(Boolean(True).lt(Boolean(True)).value, False)
         self.assertEqual(Integer(10).lt(Integer(9)).value, False)
         self.assertEqual(Float(10.).lt(Float(9.)).value, False)
-        self.assertEqual(Boolean(True).lt(Boolean(False)).value, False)
 
         self.assertEqual(Integer(10).gt(Integer(11)).value, False)
         self.assertEqual(Float(10.).gt(Float(11.)).value, False)
-        self.assertEqual(Boolean(False).gt(Boolean(True)).value, False)
         self.assertEqual(Integer(10).gt(Integer(10)).value, False)
         self.assertEqual(Float(10.).gt(Float(10.)).value, False)
-        self.assertEqual(Boolean(True).gt(Boolean(True)).value, False)
         self.assertEqual(Integer(11).gt(Integer(10)).value, True)
         self.assertEqual(Float(11.).gt(Float(10.)).value, True)
-        self.assertEqual(Boolean(True).gt(Boolean(False)).value, True)
 
         self.assertEqual(Integer(10).lte(Integer(11)).value, True)
         self.assertEqual(Float(10.).lte(Float(11.)).value, True)
-        self.assertEqual(Boolean(False).lte(Boolean(True)).value, True)
         self.assertEqual(Integer(10).lte(Integer(10)).value, True)
         self.assertEqual(Float(10.).lte(Float(10.)).value, True)
-        self.assertEqual(Boolean(True).lte(Boolean(True)).value, True)
         self.assertEqual(Integer(11).lte(Integer(10)).value, False)
         self.assertEqual(Float(11.).lte(Float(10.)).value, False)
-        self.assertEqual(Boolean(True).lte(Boolean(False)).value, False)
 
         self.assertEqual(Integer(10).gte(Integer(11)).value, False)
         self.assertEqual(Float(10.).gte(Float(11.)).value, False)
-        self.assertEqual(Boolean(False).gte(Boolean(True)).value, False)
         self.assertEqual(Integer(10).gte(Integer(10)).value, True)
         self.assertEqual(Float(10.).gte(Float(10.)).value, True)
-        self.assertEqual(Boolean(True).gte(Boolean(True)).value, True)
         self.assertEqual(Integer(11).gte(Integer(10)).value, True)
         self.assertEqual(Float(11.).gte(Float(10.)).value, True)
-        self.assertEqual(Boolean(True).gte(Boolean(False)).value, True)
 
 
 if __name__ == '__main__':

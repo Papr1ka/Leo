@@ -1,0 +1,34 @@
+{
+  "name": "leo-lang",
+  "displayName": "Leo lang",
+  "description": "Syntax highlight for leo lang",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.84.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "leo",
+        "aliases": [
+          "Leo",
+          "leo"
+        ],
+        "extensions": [
+          ".leo"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "leo",
+        "scopeName": "source.leo",
+        "path": "./syntaxes/leo.tmLanguage.json"
+      }
+    ]
+  }
+}

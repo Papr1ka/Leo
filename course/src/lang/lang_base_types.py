@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from enum import Enum
 from typing import Union
 
 from src.constants import Lex
@@ -18,18 +19,6 @@ class BaseType(ABC):
     def eq(self, other):
         return Boolean(self.value.__eq__(other.value))
 
-    def lt(self, other):
-        return Boolean(self.value.__lt__(other.value))
-
-    def lte(self, other):
-        return Boolean(self.value.__le__(other.value))
-
-    def gt(self, other):
-        return Boolean(self.value.__gt__(other.value))
-
-    def gte(self, other):
-        return Boolean(self.value.__ge__(other.value))
-
     def or_(self, other):
         return Boolean(bool(self.value) or bool(other.value))
 
@@ -38,6 +27,9 @@ class BaseType(ABC):
 
     def not_(self):
         return Boolean(not bool(self.value))
+
+    def __str__(self):
+        return str(self.value)
 
 
 class Number(BaseType):
@@ -57,6 +49,19 @@ class Number(BaseType):
     @abstractmethod
     def div(self, other):
         pass
+
+    def lt(self, other):
+        tmp = self.value.__lt__(other.value)
+        return Boolean(self.value.__lt__(other.value))
+
+    def lte(self, other):
+        return Boolean(self.value.__le__(other.value))
+
+    def gt(self, other):
+        return Boolean(self.value.__gt__(other.value))
+
+    def gte(self, other):
+        return Boolean(self.value.__ge__(other.value))
 
 
 class Integer(Number):
@@ -88,6 +93,9 @@ class Integer(Number):
 
     def div(self, other):
         return Integer(self.value // other.value)
+
+    def mod(self, other):
+        return Integer(self.value % other.value)
 
 
 class Float(Number):
@@ -131,3 +139,86 @@ TYPES = {
     Lex.KEYWORD_FLOAT: Float,
     Lex.KEYWORD_BOOL: Boolean
 }
+
+
+class Types(Enum):
+    int = 0
+    float = 1
+    bool = 2
+
+
+LEX_TO_TYPE_TABLE = {
+    Lex.KEYWORD_INT: Types.int,
+    Lex.KEYWORD_FLOAT: Types.float,
+    Lex.KEYWORD_BOOL: Types.bool
+}
+
+TYPE_TO_TYPE_TABLE = {
+    Integer: Types.int,
+    Float: Types.float,
+    Boolean: Types.bool
+}
+
+
+def type_to_type(t_type: Union[Integer, Float, Boolean]):
+    r = TYPE_TO_TYPE_TABLE.get(t_type.__class__)
+    if r is not None:
+        return r
+    raise ValueError("Тип не определён")
+
+
+def get_type_number_from_lex(lex: Lex) -> Types:
+    r = LEX_TO_TYPE_TABLE.get(lex)
+    if r is not None:
+        return r
+    raise ValueError("Тип не определён")
+
+
+class BinOperations(Enum):
+    sum = 0  # сумма
+    diff = 1  # разность
+    mul = 2  # произведение
+    div = 3  # частное
+    alt = 4  # операция или
+    con = 5  # операция и
+    eq = 6  # ==
+    neq = 7  # !=
+    gt = 8  # >
+    gte = 9  # >=
+    lt = 10  # <
+    lte = 11  # <=
+
+    # Оптимизация дерева
+    mod = 12  # %
+
+
+RELATION_OPERATORS = [
+    BinOperations.lt,
+    BinOperations.lte,
+    BinOperations.gt,
+    BinOperations.gte,
+    BinOperations.eq,
+    BinOperations.neq
+]
+
+LEX_TO_BIN_OP_TABLE = {
+    Lex.SEPARATOR_PLUS: BinOperations.sum,
+    Lex.SEPARATOR_MINUS: BinOperations.diff,
+    Lex.SEPARATOR_MULTIPLICATION: BinOperations.mul,
+    Lex.SEPARATOR_DIVISION: BinOperations.div,
+    Lex.SEPARATOR_OR: BinOperations.alt,
+    Lex.SEPARATOR_AND: BinOperations.con,
+    Lex.SEPARATOR_EQUALS: BinOperations.eq,
+    Lex.SEPARATOR_NOT_EQUALS: BinOperations.neq,
+    Lex.SEPARATOR_GT: BinOperations.gt,
+    Lex.SEPARATOR_GTE: BinOperations.gte,
+    Lex.SEPARATOR_LT: BinOperations.lt,
+    Lex.SEPARATOR_LTE: BinOperations.lte
+}
+
+
+def get_bin_operation_from_lex(lex: Lex) -> BinOperations:
+    r = LEX_TO_BIN_OP_TABLE.get(lex)
+    if r is not None:
+        return r
+    raise ValueError("Операция не определён")

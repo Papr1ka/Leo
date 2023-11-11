@@ -1,7 +1,7 @@
 numbers = None
 answers = None
 
-with open("test_numbers.txt") as file:
+with open("test_numbers.leo") as file:
     numbers = file.readlines()
 
 with open("test_number_answers.txt") as file:
