@@ -211,6 +211,8 @@ class Parser:
                 ctx_error("Неподдерживаемая операция для типа bool, возможно вы имели ввиду '&&'", operation)
             elif left_node.t_type != right_node.t_type:
                 ctx_error("Типы операндов не совпадают", operation)
+            elif left_node.t_type in (Types.int, Types.float) and operation.lex == Lex.SEPARATOR_AND:
+                ctx_error("Неподдерживаемая операция для числового типа", operation)
 
             node = ASTBinOperation(node, right_node, get_bin_operation_from_lex(operation.lex))
         return node
@@ -227,6 +229,8 @@ class Parser:
                 ctx_error("Неподдерживаемая операция для типа bool, возможно вы имели ввиду '||'", operation)
             elif left_node.t_type != right_node.t_type:
                 ctx_error("Типы операндов не совпадают", operation)
+            elif left_node.t_type in (Types.int, Types.float) and operation.lex == Lex.SEPARATOR_OR:
+                ctx_error("Неподдерживаемая операция для числового типа", operation)
             node = ASTBinOperation(node, right_node, get_bin_operation_from_lex(operation.lex))
         return node
 
@@ -346,6 +350,8 @@ class Parser:
         var = find_name(identifier.value)
         if var is None:
             ctx_error("Переменная не объявлена", identifier)
+        elif var.readonly:
+            ctx_error(f"Переменная доступна только для чтения", identifier)
         self.__identifier_assignment(identifier)
         self.__new_lex()
 
