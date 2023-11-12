@@ -1,5 +1,5 @@
 from src.cpp_translator import translate as cpp_translate
-from src.interpretor import run
+from src.interpreter import run
 from src.lexer import Lexer
 from src.parser import Parser
 from src.python_translator import translate as py_translate
