@@ -13,7 +13,15 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output", type=str, help="Название выходного файла", metavar="filename")
     namespace = parser.parse_args()
 
-    src.setup_source(namespace.target)
+    try:
+        src.setup_source(namespace.target)
+    except ValueError as E:
+        print(E.args[0])
+        exit(4)
+    except FileNotFoundError as E:
+        print("Файл не найден")
+        exit(5)
+
     lexer = src.Lexer()
     parser = src.Parser(lexer)
     ast = parser.parse()
