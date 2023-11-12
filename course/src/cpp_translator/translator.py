@@ -93,7 +93,7 @@ def translate_operator(ast: ASTNode, tabs: int = 1):
             node = node.next_node
         r += "\t" * tabs + "}\n"
         if ast.else_branch is not None:
-            r += "\t" * tabs + "else\n{"
+            r += "\t" * tabs + "else\n" + "\t" * tabs + "{\n"
             node = ast.else_branch
             while node is not None:
                 r += translate_operator(node, tabs + 1)
