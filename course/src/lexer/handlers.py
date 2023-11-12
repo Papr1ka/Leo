@@ -41,7 +41,7 @@ def state_start_handler():
         char: str = yield
 
         if state == 0:
-            if char.isalpha():
+            if char.isalpha() and char.isascii():
                 yield States.IDENTIFIER
             elif char in ("0", "1"):
                 yield States.NUMBER_BIN
@@ -99,12 +99,12 @@ def state_identificator_handler():
     while True:
         char: str = yield
 
-        if char.isalpha() or char.isdigit():
+        if char.isalpha() and char.isascii() or char.isdigit():
             yield States.IDENTIFIER
         elif char in SEPARATORS:
             yield Lex.IDENTIFIER, States.START
         else:
-            yield ["Идентификатор может состоять только из цифр и букв в любом регистре", States.ER]
+            yield ["Идентификатор может состоять только из цифр и латинских букв в любом регистре", States.ER]
 
 
 def state_separator_equals_handler():
