@@ -9,6 +9,12 @@ from src.tree import ASTAssignment, ASTBinOperation, ASTConst, ASTForLoop, ASTIf
 from .runtime_memory import load, store
 from ..text_driver import setup_source
 
+"""
+!!!!!!!!!!
+DEPRECATED
+!!!!!!!!!!
+"""
+
 
 def run(ast: ASTNode):
     while ast is not None:

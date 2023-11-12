@@ -1,1 +1,0 @@
-from .interpretor import run

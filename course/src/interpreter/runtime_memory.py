@@ -1,5 +1,11 @@
 from typing import Union
 
+"""
+!!!!!!!!!!
+DEPRECATED
+!!!!!!!!!!
+"""
+
 from src.lang.lang_base_types import Boolean, Float, Integer
 
 table = {
