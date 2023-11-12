@@ -1,3 +1,6 @@
+__version__ = "0.0.1"
+
+
 from src.cpp_translator import translate as cpp_translate
 from src.interpreter import run
 from src.lexer import Lexer
