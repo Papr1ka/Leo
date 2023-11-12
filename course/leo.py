@@ -12,7 +12,6 @@ if __name__ == "__main__":
                         help="Целевой язык для трансляции, py | cpp")
     parser.add_argument("-o", "--output", type=str, help="Название выходного файла", metavar="filename")
     namespace = parser.parse_args()
-    print(namespace)
 
     src.setup_source(namespace.target)
     lexer = src.Lexer()
