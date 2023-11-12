@@ -19,15 +19,6 @@ class BaseType(ABC):
     def eq(self, other):
         return Boolean(self.value.__eq__(other.value))
 
-    def or_(self, other):
-        return Boolean(bool(self.value) or bool(other.value))
-
-    def and_(self, other):
-        return Boolean(bool(self.value) and bool(other.value))
-
-    def not_(self):
-        return Boolean(not bool(self.value))
-
     def __str__(self):
         return str(self.value)
 
@@ -132,6 +123,15 @@ class Boolean(BaseType):
         if not isinstance(value, bool):
             raise ValueError("Значение параметра value должно быть типа bool")
         self.value = value
+
+    def or_(self, other):
+        return Boolean(bool(self.value) or bool(other.value))
+
+    def and_(self, other):
+        return Boolean(bool(self.value) and bool(other.value))
+
+    def not_(self):
+        return Boolean(not bool(self.value))
 
 
 TYPES = {
