@@ -10,6 +10,10 @@ type_enum_to_type_str_table = {
     Types.bool: "bool"
 }
 
+python_bool_to_cpp_bool = {
+    True: "true",
+    False: "false"
+}
 
 def translate(ast: ASTNode):
     r = "#include <iostream>\n\n"
@@ -24,6 +28,8 @@ def translate(ast: ASTNode):
 def translate_expression(ast: ASTTyped) -> str:
     if ast.a_type == ASTType.CONST:
         ast: ASTConst
+        if ast.t_type == Types.bool:
+            return python_bool_to_cpp_bool[ast.value.value]
         return str(ast.value)
     elif ast.a_type == ASTType.VAR:
         ast: ASTVar
