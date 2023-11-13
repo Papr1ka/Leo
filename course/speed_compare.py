@@ -43,8 +43,25 @@ def main():
             print(number)
 
 
+def test_for():
+    j = 0
+    for i in range(0, 1000000, 1):
+        j += 1
+
+    print(j)
+
+
+def test_while():
+    j = 0
+    i = 0
+    while i < 1000000:
+        j += 1
+        i += 1
+
+    print(j)
+
 if __name__ == '__main__':
-    setup_source("./examples/ex1.leo")
+    setup_source("examples/primes.leo")
     lexer = Lexer()
 
     parser = Parser(lexer)
@@ -58,10 +75,12 @@ if __name__ == '__main__':
 
     for i in range(10):
         t_1_0 = time()
-        main()
+        # main()
+        test_for()
         t_1_1 = time()
         t_2_0 = time()
-        primes()
+        # primes()
+        test_while()
         t_2_1 = time()
         t_1 = t_1_1 - t_1_0
         t_2 = t_2_1 - t_2_0

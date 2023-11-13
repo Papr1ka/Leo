@@ -1,3 +1,7 @@
+/*
+    Поиск минимального из 5-ти различных чисел
+    Вывод: минимальное из number1 ... number5
+*/
 {
     int number1, number2, number3, number4, number5;
     int min;

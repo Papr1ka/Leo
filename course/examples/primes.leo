@@ -1,30 +1,29 @@
+/*
+    Поиск первых n простых чисел
+    Ввод: n
+    Вывод: Последовательность из n простых чисел, начиная с единицы
+*/
 {
-    int primeNumberCount, number, i, j;
-    int n;
+    int primeNumberCount, number, j;
 
-    readln n;
+    readln primeNumberCount;
+    number := 1;
 
-    primeNumberCount := 100;
-
-    number := 0;
-
-    while ((primeNumberCount > 0) && (number < n))
+    while (primeNumberCount > 0)
     begin
-    number := number + 1;
-    j := 0;
+        number := number + 1;
+        j := 0;
+        for i := 1 to number + 1 step 1
+        begin
+            if (number / i * i == number)
+                j := j + 1
+        end
+        next;
 
-    for i := 1 to number + 1 step 1
-    begin
-
-    if (number / i * i == number) j := j + 1
-
-    end
-    next;
-
-    if (j == 2)
-    begin
-    primeNumberCount := primeNumberCount - 1;
-    writeln number
-    end
+        if (j == 2)
+        begin
+            primeNumberCount := primeNumberCount - 1;
+            writeln number
+        end
     end;
 }
