@@ -20,14 +20,27 @@ class States(Enum):
     LETTER_O = 15
 
     # Разделители
+    # SEPARATOR_NOT_EQUALS = 16
     SEPARATOR_EQUALS = 17
+    # SEPARATOR_LTE = 18
+    # SEPARATOR_GTE = 19
     SEPARATOR_OR = 20
     SEPARATOR_AND = 21
     SEPARATOR_ASSIGNMENT = 22
+    # SEPARATOR_LEFT_BRACKET = 23
+    # SEPARATOR_RIGHT_BRACKET = 24
+    # SEPARATOR_PLUS = 25
+    # SEPARATOR_MINUS = 26
+    # SEPARATOR_MULTIPLICATION = 27
+    # SEPARATOR_DIVISION = 28
+    # SEPARATOR_LEFT_FIGURE_BRACKET = 29
+    # SEPARATOR_RIGHT_FIGURE_BRACKET = 30
+    # SEPARATOR_SEMICOLON = 31
     SEPARATOR_NOT = 32
     SEPARATOR_LT = 33
     SEPARATOR_GT = 34
     SEPARATOR_COMMENT = 35
+    # DELIM = 50
 
     STATE_NULL = -1  # вспомогательное состояние, когда буфер накопился, но это не лексема (комментарий)
 
@@ -37,6 +50,7 @@ BASE_SEPARATORS = (
     " ",
     "\n",
     "\t",
+    "@",
 )
 
 # Границы лексем

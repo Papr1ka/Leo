@@ -23,7 +23,7 @@ class Parser:
         try:
             self.lexeme = next(self.lexer)
         except StopIteration:
-            self.lexeme = Lexeme(Lex.EOF, "", self.lexeme.line, self.lexeme.symbol + len(self.lexeme.value), "")
+            pass
         else:
             return self.lexeme
 

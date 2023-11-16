@@ -1,4 +1,3 @@
-from src.errors import translation_error
 from src.tree import *
 
 type_enum_to_type_str_table = {
@@ -29,9 +28,6 @@ def translate_expression(ast: ASTTyped) -> str:
         return str(ast.value)
     elif ast.a_type == ASTType.VAR:
         ast: ASTVar
-        name = str(ast.name)
-        if name in ("input", "print"):
-            translation_error(f"{name} зарезервировано языком Python")
         return str(ast.name)
 
     elif ast.a_type == ASTType.U_OP:
