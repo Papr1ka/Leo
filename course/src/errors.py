@@ -1,5 +1,5 @@
 from .constants import Lex, Lexeme, semantic
-from .text_driver import highlight, get_filename
+from .text_driver import get_filename, highlight
 
 first_string = 'Файл "{}", Строка {}, Символ {}'
 
@@ -28,3 +28,9 @@ def expected_msg(msg: str, actual: Lexeme):
 def ctx_error(msg: str, lex: Lexeme):
     error(f"Контекстная ошибка: '{lex.value}' - {msg}",
           lex.line, lex.symbol, 3)
+
+
+def translation_error(msg: str):
+    print(get_filename())
+    print(f"Ошибка трансляции: ", msg)
+    exit(10)
