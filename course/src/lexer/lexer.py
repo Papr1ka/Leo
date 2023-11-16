@@ -115,6 +115,7 @@ class Lexer():
                     self._error_message = "Комментарий должен быть закрыт"
                     yield self._give_lex(Lex.UNRESOLVED)
                 self._buffer = ""
+                self._symbol -= 1
                 yield self._give_lex(Lex.EOF)
                 return
 
@@ -137,6 +138,9 @@ class Lexer():
             if new_state == States.STATE_NULL:
                 new_state = States.START
                 self._buffer = ""
+                self._unget_char()
+                self._state = new_state
+                continue
 
             # выдаём распознанную лексему
             elif lex is not None:
@@ -160,6 +164,8 @@ class Lexer():
                 self._symbol += len(self._buffer)
                 self._buffer = ""
 
+            if self._state == States.SEPARATOR_COMMENT and new_state == States.SEPARATOR_COMMENT:
+                self._symbol += 1
             self._state = new_state
 
             # подсчёт номера линии и символа в строке
