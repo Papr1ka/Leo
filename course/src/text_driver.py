@@ -14,7 +14,7 @@ def read_file(filename: pathlib.Path) -> str:
         _lines = file.readlines()
     if not _lines:
         _lines = [""]
-    stream = "".join(_lines) + "@"
+    stream = "".join(_lines) + " "
     stream = stream.replace("\t", "    ")  # замена табов на 4 пробела
     return stream
 
