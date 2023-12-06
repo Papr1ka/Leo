@@ -50,7 +50,10 @@ if __name__ == "__main__":
         else:
             result = src.cpp_translate(ast)
 
-        with open(namespace.output, "w") as file:
-            file.writelines(result)
+        if namespace.output == "std":
+            print(result)
+        else:
+            with open(namespace.output, "w") as file:
+                file.writelines(result)
 
     print("Leo: Успешно")
