@@ -272,7 +272,7 @@ class Parser:
 
         return ASTAssignment(var, node_expression)
 
-    def __operator_if_parser(self) -> ASTNode:
+    def __operator_if_parser(self) -> ASTIf:
         self.__skip_lex(Lex.KEYWORD_IF)
         self.__skip_lex(Lex.SEPARATOR_LEFT_BRACKET)
         lex_condition_start = self.lexeme
@@ -290,7 +290,7 @@ class Parser:
 
         return ASTIf(node_condition, node_branch)
 
-    def __operator_for_parser(self) -> Tuple[ASTNode, ASTNode]:
+    def __operator_for_parser(self) -> ASTForLoop:
         self.__skip_lex(Lex.KEYWORD_FOR)
         lex_assignment_start = self.lexeme
 
@@ -328,9 +328,9 @@ class Parser:
 
         node_loop = ASTForLoop(node_assignment, node_expression, node_body_start, node_step)
         close_scope()
-        return node_loop, node_loop
+        return node_loop
 
-    def __operator_while_parser(self) -> ASTNode:
+    def __operator_while_parser(self) -> ASTLoop:
         self.__skip_lex(Lex.KEYWORD_WHILE)
         self.__skip_lex(Lex.SEPARATOR_LEFT_BRACKET)
         lex_condition_start = self.lexeme
@@ -341,7 +341,7 @@ class Parser:
         node_body, _ = self.__operator_parser()
         return ASTLoop(node_condition, node_body)
 
-    def __operator_readln_parser(self) -> ASTNode:
+    def __operator_readln_parser(self) -> ASTIn:
         self.__skip_lex(Lex.KEYWORD_READLN)
         if self.lexeme.lex != Lex.IDENTIFIER:
             expected(Lex.IDENTIFIER, self.lexeme)
@@ -373,7 +373,7 @@ class Parser:
 
         return ASTIn(head)
 
-    def __operator_writeln_parser(self) -> ASTNode:
+    def __operator_writeln_parser(self) -> ASTOut:
         self.__skip_lex(Lex.KEYWORD_WRITELN)
         head = self.__expression_parser()
         node = head
@@ -393,7 +393,7 @@ class Parser:
         elif self.lexeme.lex == Lex.KEYWORD_IF:
             node = self.__operator_if_parser()
         elif self.lexeme.lex == Lex.KEYWORD_FOR:
-            return self.__operator_for_parser()
+            node = self.__operator_for_parser()
         elif self.lexeme.lex == Lex.KEYWORD_WHILE:
             node = self.__operator_while_parser()
         elif self.lexeme.lex == Lex.KEYWORD_READLN:

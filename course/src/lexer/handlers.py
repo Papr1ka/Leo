@@ -534,21 +534,21 @@ class HandlerFactory:
     """
 
     # кэшированные генераторы
-    cache: dict
+    _cache: dict
 
     def __init__(self):
-        self.cache = {}
+        self._cache = {}
 
     def get_handler(self, state: States):
         """
         Метод возвращает генератор из кэша или возвращает созданный, обернув его в оболочку renewable
         в зависимости от состояния
         """
-        from_cache = self.cache.get(state, None)
+        from_cache = self._cache.get(state, None)
         if (from_cache is not None):
             return from_cache
         handler = self.init_handler(state)
-        self.cache[state] = handler
+        self._cache[state] = handler
         return handler
 
     def init_handler(self, state):
@@ -576,7 +576,7 @@ class HandlerFactory:
                 data = yield new_state
                 new_state = activated_generator.send(data)
                 if new_state != state:
-                    self.cache[state] = self.init_handler(state)
+                    self._cache[state] = self.init_handler(state)
                 next(activated_generator)
 
         return wrapper()
