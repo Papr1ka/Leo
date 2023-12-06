@@ -404,7 +404,7 @@ class Parser:
             expected_msg("Оператор", self.lexeme)
         return node, node
 
-    def __description_or_operator_seq(self) -> Tuple[ASTNode, ASTNode]:
+    def __description_or_operator_seq_parser(self) -> Tuple[ASTNode, ASTNode]:
         head = None
         tail = None
         while self.lexeme.lex in (Lex.KEYWORD_INT, Lex.KEYWORD_FLOAT, Lex.KEYWORD_BOOL,
@@ -434,7 +434,7 @@ class Parser:
         h_head, h_tail = self.__description_or_operator_parser()
         self.__skip_lex(Lex.SEPARATOR_SEMICOLON)
 
-        t_head, t_tail = self.__description_or_operator_seq()
+        t_head, t_tail = self.__description_or_operator_seq_parser()
         if t_head is not None:
             h_tail.next_node = t_head
 
