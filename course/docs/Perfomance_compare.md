@@ -177,4 +177,4 @@ def main():
 
 Резюмируя сравнение Leo vs Python
 
-![Итог Leo vs Python](./perfomance_compare_results.jpg)
+![Итог Leo vs Python](perfomance_compare_results.jpg)
