@@ -1,4 +1,4 @@
-![Leo](./Leo.jpeg)
+![Leo](./docs/Leo.jpeg)
 
 # Язык Leo
 
@@ -11,13 +11,13 @@
 
 ## Спецификация
 
-[Спецификация](./SPEC.md)
+[Спецификация](./docs/SPEC.md)
 
 ## Сравнение производительности
 
-![Perfomance](./Leo_perfomance.jpg)
+![Perfomance](./docs/Leo_perfomance.jpg)
 
-[Leo vs Python](./Perfomance_compare.md)
+[Leo vs Python](./docs/Perfomance_compare.md)
 
 ## Зависимости
 
