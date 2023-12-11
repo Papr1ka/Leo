@@ -1,0 +1,10 @@
+digraph "src.lexer.lexer.Lexer" {
+rankdir=BT
+charset="utf-8"
+"src.constants.States.START" [color="black", fontcolor="black", label=<{src.constants.START|name<br ALIGN="LEFT"/>value<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"src.constants.States" [color="black", fontcolor="black", label=<{src.constants.States|name<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"src.lexer.handlers.HandlerFactory" [color="black", fontcolor="black", label=<{src.lexer.handlers.HandlerFactory|cache : dict<br ALIGN="LEFT"/>|get_handler(state: States)<br ALIGN="LEFT"/>init_handler(state)<br ALIGN="LEFT"/>renewable(state: States, activated_generator: state_handler)<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"src.lexer.lexer.Lexer" [color="black", fontcolor="black", label=<{src.lexer.lexer.Lexer|buffer : str<br ALIGN="LEFT"/>errorMessage : str<br ALIGN="LEFT"/>factory<br ALIGN="LEFT"/>index : int<br ALIGN="LEFT"/>line : int<br ALIGN="LEFT"/>source : str<br ALIGN="LEFT"/>state<br ALIGN="LEFT"/>symbol : int<br ALIGN="LEFT"/>|get_char()<br ALIGN="LEFT"/>get_lex()<br ALIGN="LEFT"/>give_lex(lex: Lex)<br ALIGN="LEFT"/>unget_char()<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"src.constants.States.START" -> "src.lexer.lexer.Lexer" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="state", style="solid"];
+"src.lexer.handlers.HandlerFactory" -> "src.lexer.lexer.Lexer" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="factory", style="solid"];
+}
