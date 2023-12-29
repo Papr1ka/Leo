@@ -48,25 +48,29 @@ def main(filename: str):
     if not os.path.exists(os.path.join(DIR, src.__vm_version__)):
         os.mkdir(os.path.join(DIR, src.__vm_version__))
 
-    with open(os.path.join(DIR, f"{src.__vm_version__}/{filename.split('/')[2]}.leo.txt"), mode="w") as file:
+    with open(os.path.join(DIR, f"{src.__vm_version__}/{filename.split('/')[2].split('.')[0]}.leo.txt"), mode="w") as file:
+        with open(os.path.join(DIR, f"{src.__vm_version__}/{filename.split('/')[2].split('.')[0]}.leo_bin.txt"),
+                  mode="w") as file2:
 
-        while i < len(commands):
-            j = i
-            cmd = CMD(commands[i])
-            arg = ""
-            if cmd in (CMD.STORE, CMD.LOAD, CMD.JIF, CMD.JIT, CMD.GOTO, CMD.LOAD_CONST, CMD.INPUT):
+            while i < len(commands):
+                j = i
+                cmd = CMD(commands[i])
+                file2.write(str(cmd.value) + "\n")
+                arg = ""
+                if cmd in (CMD.STORE, CMD.LOAD, CMD.JIF, CMD.JIT, CMD.GOTO, CMD.LOAD_CONST, CMD.INPUT):
+                    i += 1
+                    file2.write(str(commands[i]) + "\n")
+                    if cmd == CMD.INPUT:
+                        arg = Types(commands[i]).name
+                    elif cmd in (CMD.LOAD, CMD.STORE):
+                        arg = table[commands[i]]
+                    else:
+                        arg = commands[i]
+                if arg is None:
+                    print("Ошибка, arg == None")
+                print(pattern.format(j, cmd.name, arg))
+                file.write(pattern.format(j, cmd.name, arg) + "\n")
                 i += 1
-                if cmd == CMD.INPUT:
-                    arg = Types(commands[i]).name
-                elif cmd in (CMD.LOAD, CMD.STORE):
-                    arg = table[commands[i]]
-                else:
-                    arg = commands[i]
-            if arg is None:
-                print("Ошибка, arg == None")
-            print(pattern.format(j, cmd.name, arg))
-            file.write(pattern.format(j, cmd.name, arg) + "\n")
-            i += 1
 
     t_vm = timeit(src.run, 10)(commands, var_count)
 
@@ -82,6 +86,7 @@ def main(filename: str):
     ws.append([filename, t_python, t_old_executer, t_vm, datetime.datetime.now(), src.__vm_version__])
 
     wb.save("speed_tests.xlsx")
+    wb.close()
 
 
 

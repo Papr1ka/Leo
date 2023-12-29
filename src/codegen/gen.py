@@ -12,7 +12,11 @@ reverse_table = {}
 
 
 def compile_vm(ast: ASTNode):
-    global result, count
+    global result, count, table, reverse_table
+    result = []
+    count = 0
+    table.clear()
+    reverse_table.clear()
     while ast is not None:
         translate_operator(ast)
         ast = ast.next_node

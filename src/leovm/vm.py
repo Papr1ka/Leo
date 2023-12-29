@@ -1,8 +1,8 @@
 from enum import Enum
-from typing import List, Union
+from time import time
+from typing import List
 
 from src.lang.lang_base_types import Types
-
 
 class CMD(Enum):
     # Арифметические операции
@@ -37,73 +37,91 @@ class CMD(Enum):
 
     STOP = 22  # остановка машины
 
+    DUP = 25 # дублировать вершину стека
 
-STACK_MEM = []
 
+# STACK_MEM = []
+def timeit(func, n):
+    def wrapper(*args, **kwargs):
+        times = []
+        for i in range(n):
+            t0 = time()
+            func(*args, **kwargs)
+            t1 = time()
+            times.append(t1 - t0)
+        return sum(times) / len(times)
+    return wrapper
 
 def run(commands: List, var_count: int):
-    COMMAND_MEM = commands
+    COMMAND_MEM = commands.copy()
     VAR_MEM = list(range(var_count))
-    STACK_MEM = []
+    STACK_MEM = [0 for i in range(1000)]
+
     PC = 0
+    SP = 0
+
     while True:
         IR = COMMAND_MEM[PC]
         if IR == CMD.ADD:
-            tmp = STACK_MEM.pop()
-            STACK_MEM.append(STACK_MEM.pop() + tmp)
+            STACK_MEM[SP - 2] = STACK_MEM[SP - 2] + STACK_MEM[SP - 1]
+            SP -= 1
         elif IR == CMD.DIFF:
-            tmp = STACK_MEM.pop()
-            STACK_MEM.append(STACK_MEM.pop() - tmp)
+            STACK_MEM[SP - 2] = STACK_MEM[SP - 2] - STACK_MEM[SP - 1]
+            SP -= 1
         elif IR == CMD.MUL:
-            tmp = STACK_MEM.pop()
-            STACK_MEM.append(STACK_MEM.pop() * tmp)
+            STACK_MEM[SP - 2] = STACK_MEM[SP - 2] * STACK_MEM[SP - 1]
+            SP -= 1
         elif IR == CMD.DIV:
-            tmp = STACK_MEM.pop()
-            STACK_MEM.append(STACK_MEM.pop() / tmp)
+            STACK_MEM[SP - 2] = STACK_MEM[SP - 2] / STACK_MEM[SP - 1]
+            SP -= 1
         elif IR == CMD.IDIV:
-            tmp = STACK_MEM.pop()
-            STACK_MEM.append(STACK_MEM.pop() // tmp)
+            STACK_MEM[SP - 2] = STACK_MEM[SP - 2] // STACK_MEM[SP - 1]
+            SP -= 1
         elif IR == CMD.MOD:
-            tmp = STACK_MEM.pop()
-            STACK_MEM.append(STACK_MEM.pop() % tmp)
+            STACK_MEM[SP - 2] = STACK_MEM[SP - 2] % STACK_MEM[SP - 1]
+            SP -= 1
         elif IR == CMD.NOT:
-            STACK_MEM.append(not STACK_MEM.pop())
+            STACK_MEM[SP - 1] = not STACK_MEM[SP - 1]
         elif IR == CMD.OR:
-            tmp = STACK_MEM.pop()
-            STACK_MEM.append(STACK_MEM.pop() or tmp)
+            STACK_MEM[SP - 2] = STACK_MEM[SP - 2] or STACK_MEM[SP - 1]
+            SP -= 1
         elif IR == CMD.AND:
-            tmp = STACK_MEM.pop()
-            STACK_MEM.append(STACK_MEM.pop() and tmp)
+            STACK_MEM[SP - 2] = STACK_MEM[SP - 2] and STACK_MEM[SP - 1]
+            SP -= 1
         elif IR == CMD.LT:
-            tmp = STACK_MEM.pop()
-            STACK_MEM.append(STACK_MEM.pop() < tmp)
+            STACK_MEM[SP - 2] = STACK_MEM[SP - 2] < STACK_MEM[SP - 1]
+            SP -= 1
         elif IR == CMD.LTE:
-            tmp = STACK_MEM.pop()
-            STACK_MEM.append(STACK_MEM.pop() <= tmp)
+            STACK_MEM[SP - 2] = STACK_MEM[SP - 2] <= STACK_MEM[SP - 1]
+            SP -= 1
         elif IR == CMD.GT:
-            tmp = STACK_MEM.pop()
-            STACK_MEM.append(STACK_MEM.pop() > tmp)
+            STACK_MEM[SP - 2] = STACK_MEM[SP - 2] > STACK_MEM[SP - 1]
+            SP -= 1
         elif IR == CMD.GTE:
-            tmp = STACK_MEM.pop()
-            STACK_MEM.append(STACK_MEM.pop() >= tmp)
+            STACK_MEM[SP - 2] = STACK_MEM[SP - 2] >= STACK_MEM[SP - 1]
+            SP -= 1
         elif IR == CMD.EQ:
-            tmp = STACK_MEM.pop()
-            STACK_MEM.append(STACK_MEM.pop() == tmp)
+            STACK_MEM[SP - 2] = STACK_MEM[SP - 2] == STACK_MEM[SP - 1]
+            SP -= 1
         elif IR == CMD.NEQ:
-            tmp = STACK_MEM.pop()
-            STACK_MEM.append(STACK_MEM.pop() != tmp)
+            STACK_MEM[SP - 2] = STACK_MEM[SP - 2] != STACK_MEM[SP - 1]
+            SP -= 1
         elif IR == CMD.JIT:
             PC += 1
             addr = COMMAND_MEM[PC]
-            if not STACK_MEM.pop():
+            if not STACK_MEM[SP - 1]:
                 PC = addr
+                SP -= 1
                 continue
+            SP -= 1
         elif IR == CMD.JIF:
             PC += 1
             addr = COMMAND_MEM[PC]
-            if not STACK_MEM.pop():
+            if not STACK_MEM[SP - 1]:
                 PC = addr
+                SP -= 1
                 continue
+            SP -= 1
         elif IR == CMD.GOTO:
             PC += 1
             addr = COMMAND_MEM[PC]
@@ -119,20 +137,28 @@ def run(commands: List, var_count: int):
                 value = float(value)
             elif dtype == Types.bool.value:
                 value = bool(value)
-            STACK_MEM.append(value)
+            STACK_MEM[SP] = value
+            SP += 1
         elif IR == CMD.OUTPUT:
-            print(STACK_MEM.pop())
+            print(STACK_MEM[SP - 1])
+            SP -= 1
         elif IR == CMD.LOAD:
             PC += 1
             addr = COMMAND_MEM[PC]
-            STACK_MEM.append(VAR_MEM[addr])
+            STACK_MEM[SP] = VAR_MEM[addr]
+            SP += 1
         elif IR == CMD.STORE:
             PC += 1
             addr = COMMAND_MEM[PC]
-            VAR_MEM[addr] = STACK_MEM.pop()
+            VAR_MEM[addr] = STACK_MEM[SP - 1]
+            SP -= 1
         elif IR == CMD.LOAD_CONST:
             PC += 1
-            STACK_MEM.append(COMMAND_MEM[PC])
+            STACK_MEM[SP] = COMMAND_MEM[PC]
+            SP += 1
+        elif IR == CMD.DUP:
+            STACK_MEM[SP] = STACK_MEM[SP - 1]
+            SP += 1
         elif IR == CMD.STOP:
             print("Программа завершена")
             break
@@ -169,6 +195,39 @@ if __name__ == "__main__":
         CMD.STOP
     ]
 
+    COMMAND_MEM = [
+        CMD.LOAD_CONST,
+        100000,
+        CMD.DUP,
+        CMD.DUP,
+        CMD.LOAD_CONST,
+        0,
+        CMD.GT,
+        CMD.JIF,
+        16 - 1,
+        CMD.LOAD_CONST,
+        1,
+        CMD.DIFF,
+        CMD.DUP,
+        CMD.GOTO,
+        5 - 1,
+        CMD.OUTPUT,
+        CMD.STOP
+    ]
+
     VAR_MEM = list(range(1))
 
-    run()
+    t = timeit(run, 10)(COMMAND_MEM, 1)
+    print(t, "Секунд") # 1.74079
+
+
+    def myfunc():
+        x = 1000000
+        while (x > 0):
+            x = x - 1
+
+        print(x)
+
+
+    t = timeit(myfunc, 10)()
+    print(t, "Секунд")  # существенно быстрее)
