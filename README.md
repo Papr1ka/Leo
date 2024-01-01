@@ -5,46 +5,54 @@
 [![latest
 release](https://img.shields.io/github/v/release/Papr1ka/Leo.svg?label=current+release)](https://github.com/Papr1ka/Leo/releases)
 
-Язык Leo - это учебный транслируемый язык программирования, который может быть использован для несложных линейных
+Язык Leo - это учебный язык программирования, который может быть использован для несложных линейных
 программ с числовыми и логическим типом данных
 
-Язык поддерживает трансляцию в **python** и **c++**
-
-Целевой случай - это трансляция в python и непосредственное исполнение, всё это делается под капотом
+Язык нацелен на компиляцию в байткод для **виртуальной машины** (LEO/vm), также поддерживает трансляцию в **python** и **c++**.
 
 ## Спецификация
 
 [Спецификация](./docs/SPEC.md)
 
-## Сравнение производительности
-
-![Perfomance](./docs/Leo_perfomance.jpg)
-
-[Leo vs Python](./docs/Perfomance_compare.md)
-
 ## Зависимости
 
 - Python3 >= 3.8
 
+- Перед использованием виртуальной машины требуется сначала её собрать (Makefile имеется).
+
+## Виртуальная машина
+
+[Про виртуальную машину можно прочитать тут](./vm/Readme.md).
+
 ## Запуск
 
-интерпретатор/транслятор - `leo.py`
+компилятор/транслятор - `leoc.py`
 
-Запуск скрипта source.leo
+Компиляция скрипта source.leo
 
-`python leo.py source.leo`
+`python leoc.py source.leo`
 
 Трансляция скрипта source.leo на язык python в файл out.py
 
-`python leo.py source.leo -t py -o out.py`
+`python leoc.py source.leo -t py -o out.py`
 
 Трансляция скрипта source.leo на язык c++ в файл out.cpp
 
-`python leo.py source.leo -t cpp -o out.cpp`
+`python leoc.py source.leo -t cpp -o out.cpp`
 
-Дополнительную информацию можно получить через команду `help`
+Компиляция скрипта source.leo в файл out.leo.bin
 
-`python leo.py -h`
+`python leoc.py source.leo -o out.leo.bin`
+
+> Если не указывать имя выходного файла, оно будет сформировано на основе входного.
+
+Получение справки
+
+`python leoc.py -h`
+
+Получение версии
+
+`python leoc.py --v`
 
 ## Подсветка синтаксиса для vscode
 

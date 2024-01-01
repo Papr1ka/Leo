@@ -13,7 +13,7 @@ class RussianHelpFormatter(argparse.HelpFormatter):
 
 
 def main():
-    DESCRIPTION = """Интерпретатор и транслятор языка Leo (.leo) Удачи!"""
+    DESCRIPTION = """Компилятор и транслятор языка Leo (.leo) Удачи!"""
 
     parser = argparse.ArgumentParser(description=DESCRIPTION, formatter_class=RussianHelpFormatter, add_help=False)
     parser._positionals.title = "Позиционные аргументы"
@@ -23,7 +23,7 @@ def main():
     parser.add_argument('-h', '--help', action='help', default=argparse.SUPPRESS,
                         help='Выводит это сообщение')
     parser.add_argument("target", type=pathlib.Path, help="Имя файла с расширением .leo", metavar="файл.leo")
-    parser.add_argument("-t", "--translate", type=str, choices=['py', 'cpp'], default="py",
+    parser.add_argument("-t", "--translate", type=str, choices=['py', 'cpp'],
                         help="Целевой язык для трансляции, 'py' - python, 'cpp' - c++")
     parser.add_argument("-o", "--output", type=str, help="Название выходного файла", metavar="имя_файла")
     namespace = parser.parse_args()
@@ -42,20 +42,34 @@ def main():
     ast = parser.parse()
 
     if namespace.output is None:
-        result = src.py_translate(ast)
+        if namespace.translate is not None:
+            if namespace.translate == "py":
+                result = src.py_translate(ast)
+            else:
+                result = src.cpp_translate(ast)
 
-        exec(result)
-    else:
-        if namespace.translate == "py":
-            result = src.py_translate(ast)
-        else:
-            result = src.cpp_translate(ast)
-
-        if namespace.output == "std":
-            print(result)
-        else:
-            with open(namespace.output, "w") as file:
+            with open(namespace.target.stem + "." + namespace.translate, "w") as file:
                 file.writelines(result)
+        else:
+            program, var_count, consts = src.compile_vm(ast)
+            src.write_program(namespace.target.stem + ".leo.bin", var_count, consts, program)
+    else:
+
+        if namespace.translate is not None:
+            if namespace.translate == "py":
+                result = src.py_translate(ast)
+            else:
+                result = src.cpp_translate(ast)
+
+            if namespace.output == "std":
+                print(result)
+            else:
+                with open(namespace.output, "w") as file:
+                    file.writelines(result)
+
+        else:
+            program, var_count, consts = src.compile_vm(ast)
+            src.write_program(namespace.output, var_count, consts, program)
 
     print("Leo: Успешно")
 

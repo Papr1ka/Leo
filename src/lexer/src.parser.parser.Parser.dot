@@ -1,8 +1,0 @@
-digraph "src.parser.parser.Parser" {
-rankdir=BT
-charset="utf-8"
-"src.constants.Lex" [color="black", fontcolor="black", label=<{src.constants.Lex|name<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
-"src.constants.Lexeme" [color="black", fontcolor="black", label=<{src.constants.Lexeme|error : str<br ALIGN="LEFT"/>lex<br ALIGN="LEFT"/>line : int<br ALIGN="LEFT"/>symbol : int<br ALIGN="LEFT"/>value : str<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
-"src.parser.parser.Parser" [color="black", fontcolor="black", label=<{src.parser.parser.Parser|lexeme<br ALIGN="LEFT"/>lexer : Generator<br ALIGN="LEFT"/>|parse(): ASTNode<br ALIGN="LEFT"/>print(node: ASTNode)<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
-"src.constants.Lex" -> "src.constants.Lexeme" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="lex", style="solid"];
-}

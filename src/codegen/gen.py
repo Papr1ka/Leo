@@ -1,87 +1,93 @@
 """
 Модуль синтезации программы на c++ из абстрактного дерева
 """
-from src.lang import TYPE_TO_TYPE_TABLE
-from src.leovm.vm import CMD
+from .commands import CMD
 from src.tree import *
 
-result = []
-count = 0
-table = {}
-reverse_table = {}
+_program = []
+_var_count = 0
+_var_table = {}
+_consts = []
+_const_count = 0
 
 
 def compile_vm(ast: ASTNode):
-    global result, count, table, reverse_table
-    result = []
-    count = 0
-    table.clear()
-    reverse_table.clear()
+    global _program, _var_count, _var_table, _consts, _const_count
+    _program.clear()
+    _var_count = 0
+    _var_table.clear()
+    _consts.clear()
+    _const_count = 0
     while ast is not None:
         translate_operator(ast)
         ast = ast.next_node
-    result.append(CMD.STOP)
-    return result.copy(), count, reverse_table.copy()
+    _program.append(CMD.STOP)
+    return _program.copy(), _var_count, _consts.copy()
 
 
 def translate_expression(ast: ASTTyped):
     if ast.a_type == ASTType.CONST:
         ast: ASTConst
-        result.append(CMD.LOAD_CONST)
-        result.append(ast.value.value)
+        alloc_const(ast.t_type, ast.value.value)
+        _program.append(CMD.LOAD_CONST)
+        _program.append(_const_count - 1)
     elif ast.a_type == ASTType.VAR:
         ast: ASTVar
-        result.append(CMD.LOAD)
-        result.append(table[ast.name])
+        _program.append(CMD.LOAD)
+        _program.append(_var_table[ast.name])
 
     elif ast.a_type == ASTType.U_OP:
         ast: ASTUOperation
         translate_expression(ast.operand)
-        result.append(CMD.NOT)
+        _program.append(CMD.NOT)
 
     elif ast.a_type == ASTType.BIN_OP:
         ast: ASTBinOperation
         translate_expression(ast.left)
         translate_expression(ast.right)
         if ast.operation == BinOperations.sum:
-            result.append(CMD.ADD)
+            _program.append(CMD.ADD)
         elif ast.operation == BinOperations.diff:
-            result.append(CMD.DIFF)
+            _program.append(CMD.SUB)
         elif ast.operation == BinOperations.mul:
-            result.append(CMD.MUL)
+            _program.append(CMD.MUL)
         elif ast.operation == BinOperations.div:
             if ast.t_type == Types.int:
-                result.append(CMD.IDIV)
+                _program.append(CMD.IDIV)
             else:
-                result.append(CMD.DIV)
+                _program.append(CMD.DIV)
         elif ast.operation == BinOperations.alt:
-            result.append(CMD.OR)
+            _program.append(CMD.OR)
         elif ast.operation == BinOperations.con:
-            result.append(CMD.AND)
+            _program.append(CMD.AND)
         elif ast.operation == BinOperations.lt:
-            result.append(CMD.LT)
+            _program.append(CMD.LT)
         elif ast.operation == BinOperations.lte:
-            result.append(CMD.LTE)
+            _program.append(CMD.LTE)
         elif ast.operation == BinOperations.gt:
-            result.append(CMD.GT)
+            _program.append(CMD.GT)
         elif ast.operation == BinOperations.gte:
-            result.append(CMD.GTE)
+            _program.append(CMD.GTE)
         elif ast.operation == BinOperations.eq:
-            result.append(CMD.EQ)
+            _program.append(CMD.EQ)
         elif ast.operation == BinOperations.neq:
-            result.append(CMD.NEQ)
+            _program.append(CMD.NEQ)
         elif ast.operation == BinOperations.mod:
-            result.append(CMD.MOD)
+            _program.append(CMD.MOD)
         else:
             raise ValueError("Неопределённая операция")
 
 
 def alloc_var(name: str):
-    global count, table
-    table[name] = count
-    reverse_table[count] = name
-    count += 1
+    global _var_count, _var_table
+    _var_table[name] = _var_count
+    _var_count += 1
 
+
+def alloc_const(type: Types, value: Any):
+    global _const_count, _consts
+    _consts.append((type.value, value))
+    _const_count += 1
 
 
 def translate_operator(ast: ASTNode):
@@ -97,26 +103,26 @@ def translate_operator(ast: ASTNode):
     elif ast.a_type == ASTType.ASSIGNMENT:
         ast: ASTAssignment
         translate_expression(ast.value)
-        result.append(CMD.STORE)
-        result.append(table[ast.var.name])
-        # r = "\t" * tabs + ast.var.name + " = " + translate_expression(ast.value)
+        _program.append(CMD.STORE)
+        _program.append(_var_table[ast.var.name])
 
     elif ast.a_type == ASTType.IF:
         ast: ASTIf
-        condition = translate_expression(ast.condition)
-        result.append(CMD.JIF)
-        cmd_else_addr = len(result)  # адрес будущего адреса (номера) команды, с которой начинается else
-        result.append(None)  # заглушка, тут будет адрес перехода, если условие ложно
+        translate_expression(ast.condition)
+        _program.append(CMD.JIF)
+        cmd_else_addr = len(_program)  # адрес будущего адреса (номера) команды, с которой начинается else
+        _program.append(None)  # заглушка, тут будет адрес перехода, если условие ложно
         node = ast.branch
         while node is not None:
             translate_operator(node)
             node = node.next_node
 
-        result.append(CMD.GOTO)
-        cmd_if_end_addr = len(result)  # адрес будущего адреса (номера) команды, следующей за концом оператора ветвления
-        result.append(None)  # заглушка, тут должен быть адрес перехода на конец условия
+        if ast.else_branch is not None:
+            _program.append(CMD.GOTO)
+            cmd_if_end_addr = len(_program)  # адрес будущего адреса (номера) команды, следующей за концом оператора ветвления
+            _program.append(None)  # заглушка, тут должен быть адрес перехода на конец условия
 
-        result[cmd_else_addr] = len(result)  # адрес перехода на ветку else или конец условия,
+        _program[cmd_else_addr] = len(_program)  # адрес перехода на ветку else или конец условия,
         # если условие в if было ложным
 
         if ast.else_branch is not None:
@@ -124,38 +130,38 @@ def translate_operator(ast: ASTNode):
             while node is not None:
                 translate_operator(node)
                 node = node.next_node
-        result[cmd_if_end_addr] = len(result) # оптимизировать (если нет else, бесполезный переход)
+            _program[cmd_if_end_addr] = len(_program)
 
     elif ast.a_type == ASTType.Loop:
         ast: ASTLoop
-        cmd_condition_addr = len(result)
+        cmd_condition_addr = len(_program)
         translate_expression(ast.condition)
-        result.append(CMD.JIF)
-        cmd_while_end_addr = len(result)  # адрес заглушки, где будет адрес конца цикла
-        result.append(None)  # заглушка
+        _program.append(CMD.JIF)
+        cmd_while_end_addr = len(_program)  # адрес заглушки, где будет адрес конца цикла
+        _program.append(None)  # заглушка
         node = ast.body
         while node is not None:
             translate_operator(node)
             node = node.next_node
-        result.append(CMD.GOTO)
-        result.append(cmd_condition_addr)
-        result[cmd_while_end_addr] = len(result)
+        _program.append(CMD.GOTO)
+        _program.append(cmd_condition_addr)
+        _program[cmd_while_end_addr] = len(_program)
 
     elif ast.a_type == ASTType.ForLoop:
         ast: ASTForLoop
         alloc_var(ast.assignment.var.name)
         translate_expression(ast.assignment.value)
-        result.append(CMD.STORE)  # хорошо бы в будущем добавить команду Double,
+        _program.append(CMD.STORE)  # хорошо бы в будущем добавить команду Double,
         # чтобы удвоить дублировать элемент на вершине стека
-        result.append(table[ast.assignment.var.name])
+        _program.append(_var_table[ast.assignment.var.name])
 
         # assignment = type_enum_to_type_str_table.get(
         #     Types.int) + " " + ast.assignment.var.name + " = " + translate_expression(ast.assignment.value)
-        cmd_condition_addr = len(result)  # адрес начала условия
+        cmd_condition_addr = len(_program)  # адрес начала условия
         translate_expression(ast.condition)
-        result.append(CMD.JIF)
-        cmd_for_end_addr = len(result)  # адрес заглушки, где будет адрес конца цикла for
-        result.append(None)  # заглушка
+        _program.append(CMD.JIF)
+        cmd_for_end_addr = len(_program)  # адрес заглушки, где будет адрес конца цикла for
+        _program.append(None)  # заглушка
 
         # step = translate_expression(ast.step) потом
         node = ast.body
@@ -164,24 +170,24 @@ def translate_operator(ast: ASTNode):
             node = node.next_node
 
         translate_expression(ast.step)
-        result.append(CMD.LOAD)
-        result.append(table[ast.assignment.var.name])
-        result.append(CMD.ADD)
-        result.append(CMD.STORE)  # оптимизировать
-        result.append(table[ast.assignment.var.name])
-        result.append(CMD.GOTO)
-        result.append(cmd_condition_addr)
+        _program.append(CMD.LOAD)
+        _program.append(_var_table[ast.assignment.var.name])
+        _program.append(CMD.ADD)
+        _program.append(CMD.STORE)  # оптимизировать
+        _program.append(_var_table[ast.assignment.var.name])
+        _program.append(CMD.GOTO)
+        _program.append(cmd_condition_addr)
 
-        result[cmd_for_end_addr] = len(result)
+        _program[cmd_for_end_addr] = len(_program)
 
     elif ast.a_type == ASTType.IN:
         ast: ASTIn
         node = ast.variables
         while node is not None:
-            result.append(CMD.INPUT)
-            result.append(node.t_type.value)
-            result.append(CMD.STORE)
-            result.append(table[node.name])
+            _program.append(CMD.INPUT)
+            _program.append(node.t_type.value)
+            _program.append(CMD.STORE)
+            _program.append(_var_table[node.name])
             node = node.next_node
 
     elif ast.a_type == ASTType.OUT:
@@ -189,7 +195,7 @@ def translate_operator(ast: ASTNode):
         node = ast.expressions
         while node is not None:
             translate_expression(node)
-            result.append(CMD.OUTPUT)
+            _program.append(CMD.OUTPUT)
             node = node.next_node
     else:
         raise ValueError("Оператор не определён")

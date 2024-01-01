@@ -1,4 +1,4 @@
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 
 from src.cpp_translator import translate as cpp_translate
@@ -9,4 +9,4 @@ from src.python_translator import translate as py_translate
 from src.text_driver import get_filename, setup_source
 from src.tree import optimize_tree
 from src.codegen import compile_vm
-from src.leovm import run, __vm_version__
+from src.writer import write_program
