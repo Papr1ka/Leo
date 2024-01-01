@@ -1,5 +1,0 @@
-digraph "src.constants.States" {
-rankdir=BT
-charset="utf-8"
-"src.constants.States" [color="black", fontcolor="black", label=<{src.constants.States|name<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
-}

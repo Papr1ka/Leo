@@ -121,16 +121,12 @@ def exec_operator(ast: ASTNode):
         node = ast.variables
         while node is not None:
             input_data = input()
-            setup_source(input_data)
-            lexer = Lexer()
-
-            lexeme = next(iter(lexer.get_lex()))
             if ast.variables.t_type == Types.int:
-                value = Integer.from_string(lexeme.value)
+                value = Integer(int(input_data))
             elif ast.variables.t_type == Types.float:
-                value = Float.from_string(lexeme.value)
+                value = Float(float(input_data))
             else:
-                value = Boolean.from_string(lexeme.value)
+                value = Boolean(bool(input_data))
             store(node.name, value)
             node = node.next_node
 

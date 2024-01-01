@@ -1,0 +1,229 @@
+digraph finite_state_machine {
+    
+    node [name="ER"];
+    node [name="START"];
+    node [name="START_1"];
+    node [name="START_2"];
+    node [name="START_3"];
+    node [name="START_4"];
+    node [name="START_5"];
+    node [name="START_6"];
+    node [name="START_7"];
+    node [name="START_8"];
+    node [name="START_9"];
+    node [name="START_10"];
+    
+    node [name="IDENTIFIER"];
+    node [name="NUMBER_BIN"];
+    node [name="NUMBER_OCT"];
+    node [name="NUMBER_DEC"];
+    node [name="NUMBER_HEX"];
+    node [name="NUMBER_ORDER"];
+    node [name="NUMBER_ORDER_1"];
+    node [name="NUMBER_ORDER_2"];
+    node [name="FRACTIONAL"];
+    node [name="FRACTIONAL_1"];
+    node [name="LETTER_B"];
+    node [name="LETTER_D"];
+    node [name="LETTER_E"];
+    node [name="LETTER_E_1"];
+    node [name="LETTER_E_2"];
+    node [name="LETTER_H"];
+    node [name="LETTER_O"];
+
+    node [name="SEPARATOR_EQUALS"];
+    node [name="SEPARATOR_EQUALS_1"];
+    node [name="SEPARATOR_OR"];
+    node [name="SEPARATOR_OR_1"];
+    node [name="SEPARATOR_AND"];
+    node [name="SEPARATOR_AND_1"];
+    node [name="SEPARATOR_ASSIGNMENT"];
+    node [name="SEPARATOR_NOT"];
+    node [name="SEPARATOR_NOT_1"];
+    node [name="SEPARATOR_LT"];
+    node [name="SEPARATOR_LT_1"];
+    node [name="SEPARATOR_GT"];
+    node [name="SEPARATOR_GT_1"];
+    node [name="SEPARATOR_COMMENT"];
+    node [name="SEPARATOR_COMMENT_1"];
+    node [name="SEPARATOR_COMMENT_2"];
+    node [name="SEPARATOR_COMMENT_3"];
+    node [name="NULL"];
+
+
+    "START" -> "IDENTIFIER" [label="letter"];
+    "START" -> "NUMBER_BIN" [label="'0'|'1'"];
+    "START" -> "NUMBER_OCT" [label="'2'|'3'|'4'|'5'|'6'|'7'"];
+    "START" -> "NUMBER_DEC" [label="'8'|'9'"];
+    "START" -> "FRACTIONAL" [label="'.'"];
+    "START" -> "START" [label="' '|'\\t'|'\\n'"];
+    "START" -> "START_1" [label="'('"];
+
+    "START_1" -> "START" [label="any"];
+    "START_2" -> "START" [label="any"];
+    "START_3" -> "START" [label="any"];
+    "START_4" -> "START" [label="any"];
+    "START_5" -> "START" [label="any"];
+    "START_6" -> "START" [label="any"];
+    "START_7" -> "START" [label="any"];
+    "START_8" -> "START" [label="any"];
+    "START_9" -> "START" [label="any"];
+
+    "START" -> "START_2" [label="')'"];
+    "START" -> "START_3" [label="'+'"];
+    "START" -> "START_4" [label="'-'"];
+    "START" -> "START_5" [label="'*'"];
+    "START" -> "START_6" [label="'{'"];
+    "START" -> "START_7" [label="'}'"];
+    "START" -> "START_8" [label="';'"];
+    "START" -> "START_9" [label="','"];
+
+    "START" -> "SEPARATOR_NOT" [label="'!'"];
+    "START" -> "SEPARATOR_EQUALS" [label="'='"];
+    "START" -> "SEPARATOR_LT" [label="'<'"];
+    "START" -> "SEPARATOR_GT" [label="'>'"];
+    "START" -> "SEPARATOR_OR" [label="'|"];
+    "START" -> "SEPARATOR_AND" [label="'&'"];
+    "START" -> "SEPARATOR_ASSIGNMENT" [label="':'"];
+    "START" -> "SEPARATOR_COMMENT" [label="'/'"];
+    "START" -> "ER" [label="another"];
+
+
+    "IDENTIFIER" -> "IDENTIFIER" [label="letter|digit"];
+    "IDENTIFIER" -> "START" [label="' '|'\\t'|'\\n'|'('|')'|'!'|'='|'<'|'>'|'+'|'-'|'|'|'*'|'/'|'&'|'{'|'}'|':'|';'|','"];
+    "IDENTIFIER" -> "ER" [label="another"];
+
+    "SEPARATOR_EQUALS" -> "SEPARATOR_EQUALS_1" [label="'='"];
+    "SEPARATOR_EQUALS" -> "ER" [label="another"];
+    "SEPARATOR_EQUALS_1" -> "START" [label="any"];
+
+    "SEPARATOR_LT" -> "SEPARATOR_LT_1" [label="'='"];
+    "SEPARATOR_LT" -> "START" [label="another"];
+    "SEPARATOR_LT_1" -> "START" [label="any"];
+
+    "SEPARATOR_GT" -> "SEPARATOR_GT_1" [label="'='"];
+    "SEPARATOR_GT" -> "START" [label="another"];
+    "SEPARATOR_GT_1" -> "START" [label="any"];
+
+    "SEPARATOR_OR" -> "SEPARATOR_OR_1" [label="'|'"];
+    "SEPARATOR_OR" -> "ER" [label="another"];
+    "SEPARATOR_OR_1" -> "START" [label="any"];
+
+    "SEPARATOR_AND" -> "SEPARATOR_AND_1" [label="'&'"];
+    "SEPARATOR_AND" -> "ER" [label="another"];
+    "SEPARATOR_AND_1" -> "START" [label="any"];
+
+    "SEPARATOR_ASSIGNMENT" -> "SEPARATOR_ASSIGNMENT_1" [label="'='"];
+    "SEPARATOR_ASSIGNMENT" -> "ER" [label="another"];
+    "SEPARATOR_ASSIGNMENT" -> "START" [label="any"];
+
+    "SEPARATOR_COMMENT" -> "SEPARATOR_COMMENT_1" [label="'*'"];
+    "SEPARATOR_COMMENT" -> "START" [label="another"];
+    "SEPARATOR_COMMENT_1" -> "SEPARATOR_COMMENT_2" [label="'*'"];
+    "SEPARATOR_COMMENT_1" -> "SEPARATOR_COMMENT_1" [label="another"];
+
+    "SEPARATOR_COMMENT_2" -> "SEPARATOR_COMMENT_3" [label="'/'"];
+    "SEPARATOR_COMMENT_2" -> "SEPARATOR_COMMENT_2" [label="'*'"];
+    "SEPARATOR_COMMENT_2" -> "SEPARATOR_COMMENT_1" [label="another"];
+    "SEPARATOR_COMMENT_3" -> "NULL" [label="any"];
+
+    "SEPARATOR_NOT" -> "SEPARATOR_NOT_1" [label="'='"];
+    "SEPARATOR_NOT" -> "START" [label="another"];
+    "SEPARATOR_NOT_1" -> "START" [label="any"];
+
+    "NUMBER_BIN" -> "NUMBER_BIN" [label="'0'|'1'"];
+    "NUMBER_BIN" -> "NUMBER_OCT" [label="'2'|'3'|'4'|'5'|'6'|'7'"];
+    "NUMBER_BIN" -> "NUMBER_DEC" [label="'8'|'9'"];
+    "NUMBER_BIN" -> "LETTER_E" [label="'e'|'E'"];
+    "NUMBER_BIN" -> "FRACTIONAL" [label="'.'"];
+    "NUMBER_BIN" -> "LETTER_B" [label="'b'|'B'"];
+    "NUMBER_BIN" -> "LETTER_O" [label="'o'|'O'"];
+    "NUMBER_BIN" -> "LETTER_D" [label="'d'|'D'"];
+    "NUMBER_BIN" -> "START" [label="' '|'\\t'|'\\n'|'('|')'|'!'|'='|'<'|'>'|'+'|'-'|'|'|'*'|'/'|'&'|'{'|'}'|':'|';'|','"];
+    "NUMBER_BIN" -> "NUMBER_HEX" [label="'a'|'c'|'e'|'f'|'A'|'C'|'E'|'F'"];
+    "NUMBER_BIN" -> "LETTER_H" [label="'h'|'H'"];
+    "NUMBER_BIN" -> "ER" [label="another"];
+
+    "LETTER_B" -> "START" [label="' '|'\\t'|'\\n'|'('|')'|'!'|'='|'<'|'>'|'+'|'-'|'|'|'*'|'/'|'&'|'{'|'}'|':'|';'|','"];
+    "LETTER_B" -> "NUMBER_HEX" [label="digit|'a'|'b'|'c'|'d'|'e'|'f'|'A'|'B'|'C'|'D'|'E'|'F'"];
+    "LETTER_B" -> "LETTER_H" [label="'h'|'H'"];
+    "LETTER_B" -> "ER" [label="another"];
+
+    "LETTER_D" -> "START" [label="' '|'\\t'|'\\n'|'('|')'|'!'|'='|'<'|'>'|'+'|'-'|'|'|'*'|'/'|'&'|'{'|'}'|':'|';'|','"];
+    "LETTER_D" -> "NUMBER_HEX" [label="digit|'a'|'b'|'c'|'d'|'e'|'f'|'A'|'B'|'C'|'D'|'E'|'F'"];
+    "LETTER_D" -> "LETTER_H" [label="'h'|'H'"];
+    "LETTER_D" -> "ER" [label="another"];
+
+    "LETTER_E" -> "LETTER_E_2" [label="'+'|'-'"];
+    "LETTER_E" -> "NUMBER_HEX" [label="'a'|'b'|'c'|'d'|'e'|'f'|'A'|'B'|'C'|'D'|'E'|'F'"];
+    "LETTER_E" -> "LETTER_H" [label="'h'|'H'"];
+    "LETTER_E" -> "LETTER_E_1" [label="digit"];
+    "LETTER_E" -> "ER" [label="another"];
+
+    "LETTER_E_1" -> "LETTER_E_1" [label="digit"];
+    "LETTER_E_1" -> "LETTER_H" [label="'h'|'H'"];
+    "LETTER_E_1" -> "NUMBER_HEX" [label="'a'|'b'|'c'|'d'|'e'|'f'|'A'|'B'|'C'|'D'|'E'|'F'"];
+    "LETTER_E_1" -> "START" [label="' '|'\\t'|'\\n'|'('|')'|'!'|'='|'<'|'>'|'+'|'-'|'|'|'*'|'/'|'&'|'{'|'}'|':'|';'|','"];
+    "LETTER_E_1" -> "ER" [label="another"];
+
+    "LETTER_E_2" -> "LETTER_E_2" [label="digit"];
+    "LETTER_E_2" -> "START" [label="' '|'\\t'|'\\n'|'('|')'|'!'|'='|'<'|'>'|'+'|'-'|'|'|'*'|'/'|'&'|'{'|'}'|':'|';'|','"];
+    "LETTER_E_2" -> "ER" [label="another"];
+
+    "LETTER_H" -> "START" [label="' '|'\\t'|'\\n'|'('|')'|'!'|'='|'<'|'>'|'+'|'-'|'|'|'*'|'/'|'&'|'{'|'}'|':'|';'|','"];
+    "LETTER_H" -> "ER" [label="another"];
+
+    "LETTER_O" -> "START" [label="' '|'\\t'|'\\n'|'('|')'|'!'|'='|'<'|'>'|'+'|'-'|'|'|'*'|'/'|'&'|'{'|'}'|':'|';'|','"];
+    "LETTER_O" -> "ER" [label="another"];
+
+    "NUMBER_OCT" -> "NUMBER_OCT" [label="'0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'"];
+    "NUMBER_OCT" -> "NUMBER_DEC" [label="'8'|'9'"];
+    "NUMBER_OCT" -> "LETTER_E" [label="'e'|'E'"];
+    "NUMBER_OCT" -> "FRACTIONAL" [label="'.'"];
+    "NUMBER_OCT" -> "LETTER_O" [label="'o'|'O'"];
+    "NUMBER_OCT" -> "LETTER_D" [label="'d'|'D'"];
+    "NUMBER_OCT" -> "START" [label="' '|'\\t'|'\\n'|'('|')'|!'|'='|'<'|'>'|'+'|'-'|'|'|'*'|'/'|'&'|'{'|'}'|':'|';'|','"];
+    "NUMBER_OCT" -> "LETTER_H" [label="'h'|'H'"];
+    "NUMBER_OCT" -> "NUMBER_HEX" [label="'a'|'b'|'c'|'d'|'e'|'f'|'A'|'B'|'C'|'D'|'E'|'F'"];
+    "NUMBER_OCT" -> "ER" [label="another"];
+
+    "NUMBER_DEC" -> "NUMBER_DEC" [label="digit"];
+    "NUMBER_DEC" -> "LETTER_E" [label="'e'|'E'"];
+    "NUMBER_DEC" -> "FRACTIONAL" [label="'.'"];
+    "NUMBER_DEC" -> "LETTER_D" [label="'d'|'D'"];
+    "NUMBER_DEC" -> "LETTER_H" [label="'h'|'H'"];
+    "NUMBER_DEC" -> "NUMBER_HEX" [label="'a'|'b'|'c'|'d'|'e'|'f'|'A'|'B'|'C'|'D'|'E'|'F'"];
+    "NUMBER_DEC" -> "START" [label="' '|'\\t'|'\\n'|'('|')'|'!'|'='|'<'|'>'|'+'|'-'|'|'|'*'|'/'|'&'|'{'|'}'|':'|';'|','"];
+    "NUMBER_DEC" -> "ER" [label="another"];
+
+    "NUMBER_HEX" -> "NUMBER_HEX" [label="digit|'a'|'b'|'c'|'d'|'e'|'f'|'A'|'B'|'C'|'D'|'E'|'F'"];
+    "NUMBER_HEX" -> "LETTER_H" [label="'h'|'H'"];
+    "NUMBER_HEX" -> "ER" [label="another"];
+
+    "FRACTIONAL" -> "FRACTIONAL_1" [label="digit"];
+    "FRACTIONAL" -> "ER" [label="another"];
+
+    "FRACTIONAL_1" -> "FRACTIONAL_1" [label="digit"];
+    "FRACTIONAL_1" -> "NUMBER_ORDER" [label="'e'|'E'"];
+    "FRACTIONAL_1" -> "START" [label="' '|'\\t'|'\\n'|'('|')'|'!'|'='|'<'|'>'|'+'|'-'|'|'|'*'|'/'|'&'|'{'|'}'|':'|';'|','"];
+    "FRACTIONAL_1" -> "ER" [label="another"];
+
+    "NUMBER_ORDER" -> "NUMBER_ORDER_1" [label="'+'|'-'"];
+    "NUMBER_ORDER" -> "NUMBER_ORDER_2" [label="digit"];
+    "NUMBER_ORDER" -> "ER" [label="another"];
+
+    "NUMBER_ORDER_1" -> "NUMBER_ORDER_2" [label="digit"];
+    "NUMBER_ORDER_1" -> "ER" [label="another"];
+
+    "NUMBER_ORDER_2" -> "NUMBER_ORDER_2" [label="digit"];
+    "NUMBER_ORDER_2" -> "START" [label="' '|'\\t'|'\\n'|'('|')'|'!'|'='|'<'|'>'|'+'|'-'|'|'|'*'|'/'|'&'|'{'|'}'|':'|';'|','"];
+    "NUMBER_ORDER_2" -> "ER" [label="another"];
+
+    "ER" -> "START" [label="' '|'\\t'|'\\n'|'('|')'|'!'|'='|'<'|'>'|'+'|'-'|'|'|'*'|'/'|'&'|'{'|'}'|':'|';'|','"];
+    "ER" -> "ER" [label="another"];
+
+    "NULL" -> "START";
+    
+	rankdir=LR;
+	node [shape = circle];
+}
