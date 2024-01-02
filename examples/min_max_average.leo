@@ -5,33 +5,32 @@
 	Примечание: среднее арифметическое будет вычислено как целая часть частного суммы последовательности и её длины
 */
 {
-	int min;
-	int max;
-	int sum;
+	int min
+	int max
+	int sum
 	
-	int n;
-	int curNumber;
+	int n
+	int curNumber
 
-	min := 7fffffffffffffffh;
-	max := 0;
-	sum := 0;
+	min := 7fffffffffffffffh
+	max := 0
+	sum := 0
 	
-	readln n;
+	readln n
 
 	if (n > 0)
-	begin
+	{
         for i := 0 to n
-        begin
-            readln curNumber;
+        {
+            readln curNumber
             if (curNumber > max)
-                max := curNumber;
+                max := curNumber
             if (curNumber < min)
-                min := curNumber;
+                min := curNumber
             sum := sum + curNumber
-        end
-        next;
+		}
         writeln min, max, sum / n
-	end
+	}
 	else
-	    writeln 0-1;
+	    writeln 0-1
 }

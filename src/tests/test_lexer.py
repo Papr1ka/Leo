@@ -327,20 +327,9 @@ class TestLexer(TestCase):
         self.assertEqual(next(g)[0:2], (Lex.UNRESOLVED, ":!"))
         self.assertEqual(next(g)[0:2], (Lex.UNRESOLVED, "="))
 
-        self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_SEMICOLON, ";"))
-        self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_SEMICOLON, ";"))
-        self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_SEMICOLON, ";"))
-        self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_LEFT_BRACKET, "("))
-        self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_SEMICOLON, ";"))
-        self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_RIGHT_BRACKET, ")"))
-        self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_RIGHT_BRACKET, ")"))
-        self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_SEMICOLON, ";"))
-        self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_LEFT_BRACKET, "("))
-
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_MULTIPLICATION, "*"))
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_DIVISION, "/"))
         self.assertEqual(next(g)[0:2], (Lex.IDENTIFIER, "abcd"))
-        self.assertEqual(next(g)[0:2], (Lex.KEYWORD_END, "end"))
 
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_COMMA, ","))
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_COMMA, ","))
@@ -379,17 +368,14 @@ class TestLexer(TestCase):
         self.assertEqual(next(g)[2:4], (2, 35))
         self.assertEqual(next(g)[2:4], (2, 36))
         self.assertEqual(next(g)[2:4], (2, 38))
-        self.assertEqual(next(g)[2:4], (2, 39))
 
         self.assertEqual(next(g)[2:4], (4, 5))
         self.assertEqual(next(g)[2:4], (4, 22))
         self.assertEqual(next(g)[2:4], (4, 25))
-        self.assertEqual(next(g)[2:4], (4, 27))
 
         self.assertEqual(next(g)[2:4], (5, 5))
         self.assertEqual(next(g)[2:4], (5, 12))
         self.assertEqual(next(g)[2:4], (5, 15))
-        self.assertEqual(next(g)[2:4], (5, 16))
 
         self.assertEqual(next(g)[2:4], (7, 5))
         self.assertEqual(next(g)[2:4], (7, 11))
@@ -405,12 +391,10 @@ class TestLexer(TestCase):
         self.assertEqual(next(g)[2:4], (9, 15))
         self.assertEqual(next(g)[2:4], (9, 22))
         self.assertEqual(next(g)[2:4], (9, 24))
-        self.assertEqual(next(g)[2:4], (9, 25))
 
         self.assertEqual(next(g)[2:4], (10, 5))
         self.assertEqual(next(g)[2:4], (10, 7))
         self.assertEqual(next(g)[2:4], (10, 10))
-        self.assertEqual(next(g)[2:4], (10, 11))
 
         self.assertEqual(next(g)[2:4], (12, 5))
         self.assertEqual(next(g)[2:4], (12, 9))
@@ -441,9 +425,6 @@ class TestLexer(TestCase):
 
         self.assertEqual(next(g)[2:4], (17, 5))
 
-        self.assertEqual(next(g)[2:4], (18, 5))
-        self.assertEqual(next(g)[2:4], (18, 9))
-
         self.assertEqual(next(g)[2:4], (20, 5))
         self.assertEqual(next(g)[2:4], (20, 8))
         self.assertEqual(next(g)[2:4], (20, 9))
@@ -457,11 +438,9 @@ class TestLexer(TestCase):
         self.assertEqual(next(g)[2:4], (20, 56))
 
         self.assertEqual(next(g)[2:4], (22, 5))
-        self.assertEqual(next(g)[2:4], (22, 8))
 
         self.assertEqual(next(g)[2:4], (35, 5))
         self.assertEqual(next(g)[2:4], (35, 13))
-        self.assertEqual(next(g)[2:4], (35, 19))
 
         self.assertEqual(next(g)[2:4], (36, 1))
 
@@ -548,10 +527,8 @@ class TestLexer(TestCase):
         lexer = DebugLexer().get_lex()
         g = iter(lexer)
 
-        self.assertEqual(next(g)[0:2], (Lex.KEYWORD_BEGIN, "begin"))
         self.assertEqual(next(g)[0:2], (Lex.KEYWORD_BOOL, "bool"))
         self.assertEqual(next(g)[0:2], (Lex.KEYWORD_ELSE, "else"))
-        self.assertEqual(next(g)[0:2], (Lex.KEYWORD_END, "end"))
         self.assertEqual(next(g)[0:2], (Lex.KEYWORD_FALSE, "false"))
         self.assertEqual(next(g)[0:2], (Lex.KEYWORD_FLOAT, "float"))
         self.assertEqual(next(g)[0:2], (Lex.KEYWORD_FOR, "for"))
@@ -566,16 +543,10 @@ class TestLexer(TestCase):
         self.assertEqual(next(g)[0:2], (Lex.KEYWORD_WRITELN, "writeln"))
 
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_COMMA, ","))
-        self.assertEqual(next(g)[0:2], (Lex.KEYWORD_BEGIN, "begin"))
-        self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_COMMA, ","))
-        self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_COMMA, ","))
         self.assertEqual(next(g)[0:2], (Lex.KEYWORD_BOOL, "bool"))
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_COMMA, ","))
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_COMMA, ","))
         self.assertEqual(next(g)[0:2], (Lex.KEYWORD_ELSE, "else"))
-        self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_COMMA, ","))
-        self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_COMMA, ","))
-        self.assertEqual(next(g)[0:2], (Lex.KEYWORD_END, "end"))
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_COMMA, ","))
         self.assertEqual(next(g)[0:2], (Lex.SEPARATOR_COMMA, ","))
         self.assertEqual(next(g)[0:2], (Lex.KEYWORD_FALSE, "false"))

@@ -1,7 +1,5 @@
-begin
 bool
 else
-end
 false
 float
 for
@@ -15,10 +13,8 @@ true
 while
 writeln
 
-,begin,
 ,bool,
 ,else,
-,end,
 ,false,
 ,float,
 ,for,

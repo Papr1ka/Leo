@@ -56,16 +56,13 @@ SEPARATORS = (
     "{",
     "}",
     ":",
-    ";",
     ",",
 )
 
 
 class Lex(Enum):
-    KEYWORD_BEGIN = 1
     KEYWORD_BOOL = 2
     KEYWORD_ELSE = 3
-    KEYWORD_END = 4
     KEYWORD_FALSE = 5
     KEYWORD_FLOAT = 6
     KEYWORD_FOR = 7
@@ -105,7 +102,6 @@ class Lex(Enum):
     SEPARATOR_PLUS = 38
     SEPARATOR_RIGHT_BRACKET = 39
     SEPARATOR_RIGHT_FIGURE_BRACKET = 40
-    SEPARATOR_SEMICOLON = 41
     SEPARATOR_COMMA = 42
 
     UNRESOLVED = 0
@@ -113,10 +109,8 @@ class Lex(Enum):
 
 
 KEYWORDS = {
-    'begin': Lex.KEYWORD_BEGIN,
     'bool': Lex.KEYWORD_BOOL,
     'else': Lex.KEYWORD_ELSE,
-    'end': Lex.KEYWORD_END,
     'false': Lex.KEYWORD_FALSE,
     'float': Lex.KEYWORD_FLOAT,
     'for': Lex.KEYWORD_FOR,
@@ -132,10 +126,8 @@ KEYWORDS = {
 }
 
 semantic = {
-    Lex.KEYWORD_BEGIN: "begin",
     Lex.KEYWORD_BOOL: "bool",
     Lex.KEYWORD_ELSE: "else",
-    Lex.KEYWORD_END: "end",
     Lex.KEYWORD_FALSE: "false",
     Lex.KEYWORD_FLOAT: "float",
     Lex.KEYWORD_FOR: "for",
@@ -175,7 +167,6 @@ semantic = {
     Lex.SEPARATOR_PLUS: "+",
     Lex.SEPARATOR_RIGHT_BRACKET: ")",
     Lex.SEPARATOR_RIGHT_FIGURE_BRACKET: "}",
-    Lex.SEPARATOR_SEMICOLON: ";",
     Lex.SEPARATOR_COMMA: ",",
     Lex.EOF: "Конец файла"
 }

@@ -17,13 +17,10 @@ false
 !
 {
 }
-;
 ,
 int
 float
 bool
-begin
-end
 :=
 if
 else

@@ -141,7 +141,6 @@ class Lexer():
                 self._unget_char()
                 self._state = new_state
                 continue
-
             # выдаём распознанную лексему
             elif lex is not None:
                 if lex == Lex.IDENTIFIER:

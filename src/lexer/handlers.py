@@ -53,7 +53,7 @@ def state_start_handler():
                 yield States.FRACTIONAL
             elif char in BASE_SEPARATORS:
                 yield States.START
-            elif char in ("(", ")", "+", "-", "*", "{", "}", ";", ","):
+            elif char in ("(", ")", "+", "-", "*", "{", "}", ","):
                 if char == "(":
                     state = Lex.SEPARATOR_LEFT_BRACKET, States.START
                 elif char == ")":
@@ -68,8 +68,6 @@ def state_start_handler():
                     state = Lex.SEPARATOR_LEFT_FIGURE_BRACKET, States.START
                 elif char == "}":
                     state = Lex.SEPARATOR_RIGHT_FIGURE_BRACKET, States.START
-                elif char == ";":
-                    state = Lex.SEPARATOR_SEMICOLON, States.START
                 elif char == ",":
                     state = Lex.SEPARATOR_COMMA, States.START
                 yield States.START

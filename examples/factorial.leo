@@ -4,23 +4,23 @@
     Вывод: -1, если ввод не натуральное число, иначе факториал числа
 */
 {
-    int n;
-    int factorial;
+    int n
+    int factorial
 
-    readln n;
+    readln n
     if (n >= 0)
-        begin
+    {
 
-        factorial := 1;
+        factorial := 1
 
         while (n > 1)
-        begin
-            factorial := factorial * n;
+        {
+            factorial := factorial * n
             n := n - 1
-        end;
+        }
         
         writeln factorial
-        end
+    }
     else
-        writeln 0-1;
+        writeln 0-1
 }

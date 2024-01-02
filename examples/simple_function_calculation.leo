@@ -6,10 +6,10 @@
 */
 {
 
-    float x, y;
-    readln x;
+    float x, y
+    readln x
 
-    y := x * x * x - 2.2784 * x + 1.0;
+    y := x * x * x - 2.2784 * x + 1.0
 
-    writeln y;
+    writeln y
 }

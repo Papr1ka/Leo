@@ -75,18 +75,16 @@ class Parser:
         return ASTDeclaration(head)
 
     def __operator_combine_parser(self) -> Tuple[ASTNode, ASTNode]:
-        self.__skip_lex(Lex.KEYWORD_BEGIN)
+        self.__skip_lex(Lex.SEPARATOR_LEFT_FIGURE_BRACKET)
         h_head, h_tail = self.__operator_parser()
         tail = h_tail
-        while self.lexeme.lex == Lex.SEPARATOR_SEMICOLON:
-            self.__new_lex()
-
+        while self.lexeme.lex != Lex.SEPARATOR_RIGHT_FIGURE_BRACKET:
             t_head, t_tail = self.__operator_parser()
             tail.next_node = t_head
 
             tail = t_tail
 
-        self.__skip_lex(Lex.KEYWORD_END)
+        self.__skip_lex(Lex.SEPARATOR_RIGHT_FIGURE_BRACKET)
         return h_head, tail
 
     def __identifier_assignment(self, identifier: Lexeme):
@@ -257,8 +255,6 @@ class Parser:
 
         node_body_start, _ = self.__operator_parser()
 
-        self.__skip_lex(Lex.KEYWORD_NEXT)
-
         node_loop = ASTForLoop(node_assignment, node_expression, node_body_start, node_step)
         close_scope()
         return node_loop
@@ -319,7 +315,7 @@ class Parser:
 
     def __operator_parser(self) -> Tuple[ASTNode, ASTNode]:
         node = None
-        if self.lexeme.lex == Lex.KEYWORD_BEGIN:
+        if self.lexeme.lex == Lex.SEPARATOR_LEFT_FIGURE_BRACKET:
             return self.__operator_combine_parser()
         elif self.lexeme.lex == Lex.IDENTIFIER:
             node = self.__operator_assignment_parser()
@@ -341,7 +337,7 @@ class Parser:
         head = None
         tail = None
         while self.lexeme.lex in (Lex.KEYWORD_INT, Lex.KEYWORD_FLOAT, Lex.KEYWORD_BOOL,
-                                  Lex.KEYWORD_BEGIN, Lex.IDENTIFIER, Lex.KEYWORD_IF,
+                                  Lex.SEPARATOR_LEFT_FIGURE_BRACKET, Lex.IDENTIFIER, Lex.KEYWORD_IF,
                                   Lex.KEYWORD_FOR, Lex.KEYWORD_WHILE, Lex.KEYWORD_READLN,
                                   Lex.KEYWORD_WRITELN):
             h_head, h_tail = self.__description_or_operator_parser()
@@ -351,7 +347,6 @@ class Parser:
             else:
                 tail.next_node = h_head
                 tail = h_tail
-            self.__skip_lex(Lex.SEPARATOR_SEMICOLON)
         return head, tail
 
     def __description_or_operator_parser(self) -> Tuple[ASTNode, ASTNode]:
@@ -365,7 +360,6 @@ class Parser:
         self.__skip_lex(Lex.SEPARATOR_LEFT_FIGURE_BRACKET)
 
         h_head, h_tail = self.__description_or_operator_parser()
-        self.__skip_lex(Lex.SEPARATOR_SEMICOLON)
 
         t_head, t_tail = self.__description_or_operator_seq_parser()
         if t_head is not None:

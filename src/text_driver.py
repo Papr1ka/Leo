@@ -11,7 +11,7 @@ _filename = "Интерактивный"
 def read_file(filename: pathlib.Path) -> str:
     global _lines
     with open(os.path.abspath(os.path.relpath(filename))) as file:
-        _lines = file.readlines()
+        _lines = [i.replace("\t", "    ") for i in file.readlines()]
     if not _lines:
         _lines = [""]
     stream = "".join(_lines) + " "

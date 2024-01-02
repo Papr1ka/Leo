@@ -1,4 +1,4 @@
-__version__ = "0.0.2"
+__version__ = "0.1.0"
 
 
 from src.cpp_translator import translate as cpp_translate

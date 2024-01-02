@@ -1,7 +1,5 @@
-begin
 bool
 else
-end
 false
 float
 for
