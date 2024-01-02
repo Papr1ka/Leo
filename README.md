@@ -12,9 +12,10 @@ release](https://img.shields.io/github/v/release/Papr1ka/Leo.svg?label=current+r
 
 > Обновление
 >
-> удалены токены ';' и 'next'
+> удалены токены ';' и 'next', 'begin' и 'end' заменены на '{' и '}'
 >
 > теперь писать программы существенно проще
+
 
 ## Спецификация
 
